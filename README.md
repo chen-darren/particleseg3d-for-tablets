@@ -37,7 +37,7 @@
 - Root directory must be setup as follows:
 ```
 .
-├── database
+├── databases
     ├── original_dataset
         ├── dataset
             ├── images
