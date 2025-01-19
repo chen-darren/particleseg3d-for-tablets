@@ -23,11 +23,11 @@
     - ```
         # Set path to the base directory
         if dir_location.lower() == 'internal':
-            base_path = r'\path_to_internal_drive'
+            base_path = r'\path\to\internal\drive'
         elif dir_location.lower() == 'external':
-            base_path = r'\path_to_external_drive'
+            base_path = r'\path\to\external\drive'
         elif dir_location.lower() == 'cloud':
-            base_path = r'\path_to_cloud'
+            base_path = r'\path\to\cloud'
 
 ### Ready to Go!
 - Can run all cells to run the model as well as convert results to TIFF or can run cell one by one.
