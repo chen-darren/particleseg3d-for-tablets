@@ -39,20 +39,24 @@
 .
 ├── database
     ├── original_dataset
-        ├── dataset
-            ├── images
-                ├── Ore6.zarr
-                ├── Slag3.zarr
-                ├── ...
-            ├── metadata.json
+        ├── grayscale
+            ├── dataset
+                ├── images
+                    ├── Ore6.zarr
+                    ├── Slag3.zarr
+                    ├── ...
+                ├── metadata.json
+        ├── segmented
     ├── tablet_dataset
-        ├── dataset
-            ├── images
-                ├── 1_Microsphere_Grayscale.zarr
-                ├── 2_Tablet_Grayscale.zarr
-                ├── 3_SprayDriedDispersion_Grayscale.zarr
-                ├── ...
-            ├── metadata.json
+        ├── grayscale
+            ├── dataset
+                ├── images
+                    ├── 1_Microsphere_Grayscale.zarr
+                    ├── 2_Tablet_Grayscale.zarr
+                    ├── 3_SprayDriedDispersion_Grayscale.zarr
+                    ├── ...
+                ├── metadata.json
+        ├── segmented
 ├── outputs
     ├── run_tag
     ├── ...
