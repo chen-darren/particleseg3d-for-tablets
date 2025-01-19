@@ -13,7 +13,7 @@
 4. Specify weights to use
     - Set `weights_tag` to the correct name of the weights that are desired. If the originally trained model is desired, set to `'original_particle_seg'`.
 5. Specify run tag
-    - Set `'run_tag'` to the identifier desired for the specified run and its outputs.
+    - Set `run_tag` to the identifier desired for the specified run and its outputs.
 6. Specify conda environment
     - Set `conda_env` to the name of your conda environment (should not change between runs)
 
