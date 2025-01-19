@@ -1,6 +1,6 @@
 # Senior_Design
 
-**How to run:**
+## **How to run:**
 1. Set directory location
     - Specify each 'base_path' to the correct path.
     - ```
@@ -26,7 +26,7 @@
 7. Ready to go!
     - Can run all cells to run the model as well as convert results to TIFF or can run cell one by one.
 
-**Note**
+## **Note**
 Root directory must be setup as follows:
 ```
 .
