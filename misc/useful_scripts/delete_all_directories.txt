@@ -1,0 +1,2 @@
+rmdir /s /q C:\Documents\Unwanted
+rmdir /s /q R:\ENGR_Chon\Darren\NIH_Pulsewatch\TFS_pt\128x128_bfloat16

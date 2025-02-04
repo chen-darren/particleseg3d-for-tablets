@@ -1,0 +1,2 @@
+In VS Code terminal: ssh dac20022@137.99.3.58
+Use NetID password

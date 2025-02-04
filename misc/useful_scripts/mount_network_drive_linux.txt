@@ -1,0 +1,7 @@
+# Create the mount point directory
+sudo mkdir /mnt/R
+
+# Mount the network drive
+sudo mount -t cifs //grove.ad.uconn.edu/research/ENGR_Chon /mnt/R -o username=dac20022,domain=UCONN
+
+# Root password: Chonlab2018!
