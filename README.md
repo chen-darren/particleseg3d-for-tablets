@@ -6,6 +6,7 @@
     - `'internal'` for an internal hard drive or SSD
     - `'external'` for an external hard drive or SSD
     - `'cloud'` for OneDrive
+    - `'refine'` for REFINE Lab PC
 2. Set output to cloud override
     - If it is desired to save the output to the cloud location regardless of the directory location type, then set `output_to_cloud` to `True`. Set to `False` otherwise.
 3. Set dataset
@@ -28,6 +29,8 @@
             base_path = r'\path\to\external\drive'
         elif dir_location.lower() == 'cloud':
             base_path = r'\path\to\cloud'
+        elif dir_location.lower() == 'refine':
+            base_path = r'\path\to\refine'
 
 ### Ready to Go!
 - Can run all cells to run the model as well as convert results to TIFF or can run cell one by one.
