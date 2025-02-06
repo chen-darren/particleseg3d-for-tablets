@@ -7,7 +7,7 @@ import copy
 import zarr
 from acvl_utils.miscellaneous.ptqdm import ptqdm
 import numpy_indexed as npi
-from skimage.morphology import footprint_rectangle
+from skimage.morphology import cube
 from skimage.morphology import dilation
 from scipy.ndimage.morphology import distance_transform_edt
 from typing import Tuple, Optional, Type
@@ -139,7 +139,7 @@ def border_core_component2instance_dilation(patch: np.ndarray, core_label: int =
     instances = copy.deepcopy(core_instances)
     border = patch == border_label
     while np.sum(border) > 0:
-        ball_here = footprint_rectangle(3)
+        ball_here = cube(3)
 
         dilated = dilation(core_instances, ball_here)
         dilated[patch == 0] = 0
