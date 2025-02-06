@@ -1,10 +1,10 @@
 from pathlib import Path
 import numpy as np
 from tqdm import tqdm
-from particleseg3d.utils import utils
+from utils import utils
 import json
 from os.path import join
-from particleseg3d.train.instance2border_core import instance2border_core
+from train.instance2border_core import instance2border_core
 import zarr
 from acvl_utils.miscellaneous.ptqdm import ptqdm
 import pickle

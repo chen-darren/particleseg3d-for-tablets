@@ -1,5 +1,5 @@
 import pytorch_lightning as pl
-from particleseg3d.utils import utils
+from utils import utils
 import torch.nn.functional as F
 from torch import nn
 from typing import Any
@@ -9,7 +9,7 @@ from pathlib import Path
 import torch
 import json
 from typing import Tuple, Any, Optional, Dict
-from particleseg3d.utils.nnunet_utils import InitWeights_He, Generic_UNet
+from utils.nnunet_utils import InitWeights_He, Generic_UNet
 
 
 class Nnunet(pl.LightningModule):

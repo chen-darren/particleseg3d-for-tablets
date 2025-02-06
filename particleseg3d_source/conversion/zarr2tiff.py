@@ -1,6 +1,6 @@
 import argparse
 import os
-from particleseg3d.utils import utils
+from utils import utils
 import tifffile
 from tqdm import tqdm
 from os.path import join, basename

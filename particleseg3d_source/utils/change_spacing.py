@@ -1,4 +1,4 @@
-from particleseg3d.utils import utils
+from utils import utils
 import argparse
 from tqdm import tqdm
 from os.path import join

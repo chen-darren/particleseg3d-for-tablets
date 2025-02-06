@@ -1,5 +1,5 @@
 import argparse
-from particleseg3d.utils import utils
+from utils import utils
 import zarr
 
 

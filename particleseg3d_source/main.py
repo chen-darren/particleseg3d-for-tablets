@@ -1,17 +1,17 @@
 from torch.utils.data import DataLoader
-from particleseg3d.utils import utils
+from utils import utils
 import pytorch_lightning as pl
 from os.path import join
 from numcodecs import blosc
 import shutil
 import zarr
-from particleseg3d.inference.sampler import SamplerDataset, GridSampler, ResizeSampler, ChunkedGridSampler, ChunkedResizeSampler
-from particleseg3d.inference.aggregator import WeightedSoftmaxAggregator, ResizeChunkedWeightedSoftmaxAggregator
+from inference.sampler import SamplerDataset, GridSampler, ResizeSampler, ChunkedGridSampler, ChunkedResizeSampler
+from inference.aggregator import WeightedSoftmaxAggregator, ResizeChunkedWeightedSoftmaxAggregator
 import numpy as np
 from tqdm import tqdm
-from particleseg3d.inference.model_nnunet import Nnunet
+from inference.model_nnunet import Nnunet
 import json
-from particleseg3d.inference.border_core2instance import border_core2instance
+from inference.border_core2instance import border_core2instance
 from skimage import transform as ski_transform
 from pathlib import Path
 import argparse
