@@ -44,18 +44,21 @@ def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV
     with open(join(model_dir, trainer, "plans.pkl"), 'rb') as handle:
         config = pickle.load(handle)
     
-    torch.serialization.add_safe_globals([torch._utils._rebuild_tensor_v2])
     model = Nnunet(join(model_dir, trainer), folds=folds, nnunet_trainer=trainer, configuration="3d_fullres")
     model.eval()
 
-    # Use all available GPUs with DDP strategy for efficient multi-GPU inference
+    # Use GPUs 0 and 1 with DDP strategy for efficient multi-GPU inference
     trainer = pl.Trainer(
-        gpus=-1,  # Use all available GPUs
-        strategy="ddp",  # DistributedDataParallel for better scaling
+        accelerator='gpu',  # Use the GPU accelerator
+        devices=[0, 1],  # Use GPUs 0 and 1
+        strategy="dp",  # Use DataParallel for multi-GPU
         precision=16,  # Use mixed precision for faster inference
         logger=False
     )
     
+    # # Use single GPU
+    # trainer = pl.Trainer(gpus=1, precision=16, logger=False)
+
     return trainer, model, config
 
 
@@ -600,7 +603,7 @@ def setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weight
     print('Paths set')
     return input_path, output_zarr_path, output_tiff_path, weights_path
 
-def run_inference(input_path, output_zarr_path, weights_path, name=None, target_particle_size=60, target_spacing=0.1, batch_size=6, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+def run_inference(input_path, output_zarr_path, weights_path, name=None, target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
@@ -628,4 +631,7 @@ def main(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag, 
     convert_zarr_to_tiff(output_zarr_path, output_tiff_path)
 
 if __name__ == "__main__":
-    main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['3_SprayDriedDispersion'])
+    main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg')
+    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['1_Microsphere'])
+    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['2_Tablet'])
+    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['3_SprayDriedDispersion'])

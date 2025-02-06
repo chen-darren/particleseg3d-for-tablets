@@ -198,6 +198,7 @@ class Nnunet(pl.LightningModule):
             bool: Always True. Indicates that the prediction step was successful.
         """
         img_patch, patch_indices = batch
+        img_patch = img_patch.clone()  # Create a copy of the tensor
         img_patch -= self.zscore["mean"]
         img_patch /= self.zscore["std"]
         if not self.tta:
