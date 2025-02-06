@@ -541,7 +541,7 @@ def run_inference(input_path, output_zarr_path, weights_path, name=None, target_
 def main(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag, name=None):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    # run_inference(input_path, output_zarr_path, weights_path, name)
+    run_inference(input_path, output_zarr_path, weights_path, name)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
