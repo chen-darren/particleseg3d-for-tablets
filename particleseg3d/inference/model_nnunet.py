@@ -60,7 +60,7 @@ class Nnunet(pl.LightningModule):
                 with open(join(model_dir, fold, "debug.json")) as f:
                     model_config = json.load(f)
                 network = self.initialize_network(model_config, configuration)
-                network.load_state_dict(torch.load(checkpoint_path)["state_dict"])
+                network.load_state_dict(torch.load(checkpoint_path, weights_only=False)["state_dict"])
                 ensemble.append(network)
             else:
                 print("Could not find fold {} for ensemble.".format(fold))

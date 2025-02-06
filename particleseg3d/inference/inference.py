@@ -21,11 +21,14 @@ import cc3d
 import numpy_indexed as npi
 from typing import List, Tuple, Any, Optional, Dict, Type
 from skimage import transform as ski_transform
+import tifffile
+import os
+import torch
 
 
 def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
-    Set up the model for inference.
+    Set up the model for inference with multi-GPU support.
 
     Args:
         model_dir: The directory containing the model files.
@@ -34,16 +37,25 @@ def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV
 
     Returns:
         A tuple containing:
-            trainer: The PyTorch Lightning Trainer object.
+            trainer: The PyTorch Lightning Trainer object with multi-GPU support.
             model: The initialized Nnunet model.
             config: The model configuration.
     """
     with open(join(model_dir, trainer, "plans.pkl"), 'rb') as handle:
         config = pickle.load(handle)
-
+    
+    torch.serialization.add_safe_globals([torch._utils._rebuild_tensor_v2])
     model = Nnunet(join(model_dir, trainer), folds=folds, nnunet_trainer=trainer, configuration="3d_fullres")
     model.eval()
-    trainer = pl.Trainer(gpus=1, precision=16, logger=False)
+
+    # Use all available GPUs with DDP strategy for efficient multi-GPU inference
+    trainer = pl.Trainer(
+        gpus=-1,  # Use all available GPUs
+        strategy="ddp",  # DistributedDataParallel for better scaling
+        precision=16,  # Use mixed precision for faster inference
+        logger=False
+    )
+    
     return trainer, model, config
 
 
@@ -126,7 +138,7 @@ def predict_case(
         min_rel_particle_size: The minimum relative particle size used for filtering.
         batch_size: The batch size to use during inference.
     """
-    print("Starting inference of sample: ", name)
+    print("\nStarting inference of sample: ", name)
     load_filepath = join(load_dir, "{}.zarr".format(name))
     pred_softmax_filepath, pred_border_core_filepath, pred_border_core_tmp_filepath, pred_instance_filepath = setup_folder_structure(save_dir, name)
 
@@ -503,29 +515,117 @@ def compute_patch_size(
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', "--input", required=True,
-                        help="Absolute input path to the base folder that contains the dataset structured in the form of the directories 'images' and the metadata.json.")
-    parser.add_argument('-o', "--output", required=True, help="Absolute output path to the save folder.")
-    parser.add_argument('-m', "--model", required=True, help="Absolute path to the model directory. Example: /path/to/model/Task310_particle_seg")
-    parser.add_argument('-n', "--name", required=False, type=str, nargs="+", help="(Optional) The name(s) without extension of the image(s) that should be used for inference. Multiple names must be separated by spaces.")
-    parser.add_argument('-z', '--zscore', default=(5850.29762143569, 7078.294543817302), required=False, type=float, nargs=2,
-                        help="(Optional) The target spacing in millimeters given as three numbers separate by spaces.")
-    parser.add_argument('-target_particle_size', default=60, required=False, type=int,
-                        help="(Optional) The target particle size in pixels given as three numbers separate by spaces.")
-    parser.add_argument('-target_spacing', default=0.1, required=False, type=float,
-                        help="(Optional) The target spacing in millimeters given as three numbers separate by spaces.")
-    parser.add_argument('-f', "--fold", required=False, default=(0, 1, 2, 3, 4), type=int, nargs="+", help="(Optional) The folds to use. 0, 1, 2, 3, 4 or a combination.")
-    parser.add_argument('-batch_size', default=6, required=False, type=int,
-                        help="(Optional) The batch size to use during each inference iteration. A higher batch size decreases inference time, but increases the required GPU memory.")
-    parser.add_argument('-p', '--processes', required=False, default=4, type=int, help="(Optional) Number of processes to use for parallel processing. Zero to disable multiprocessing.")
-    parser.add_argument("-min_rel_particle_size", required=False, default=0.005, type=float, help="(Optional) Minimum relative particle size used for filtering.")
-    args = parser.parse_args()
+def safe_makedirs(path):
+    try:
+        os.makedirs(path, exist_ok=True)
+    except OSError as e:
+        print(f"Error creating directory {path}: {e}")
+        cleaned_path = path.strip('"')
+        print(f"Retrying with cleaned path: {cleaned_path}")
+        try:
+            os.makedirs(cleaned_path, exist_ok=True)
+            path = cleaned_path
+        except OSError as e2:
+            print(f"Failed again with cleaned path {cleaned_path}: {e2}")
+            raise e2
+    return path
 
-    trainer, model, config = setup_model(args.model, args.fold)
-    predict_cases(args.input, args.output, args.name, trainer, model, config, args.target_particle_size, args.target_spacing, args.batch_size, args.processes, args.min_rel_particle_size, args.zscore)
+def clean_path(path):
+    return path.strip('"')
 
+def is_valid_zarr_directory(zarr_dir):
+    if not os.path.exists(zarr_dir):
+        print(f"Error: Zarr directory {zarr_dir} does not exist.")
+        return False
+    if not os.path.isdir(zarr_dir):
+        print(f"Error: {zarr_dir} is not a directory.")
+        return False
+    for image_name in os.listdir(zarr_dir):
+        image_path = os.path.join(zarr_dir, image_name)
+        zarr_file = os.path.join(image_path, f"{image_name}.zarr")
+        if os.path.isdir(image_path) and os.path.exists(zarr_file):
+            continue
+        else:
+            print(f"Warning: {image_path} is missing a corresponding .zarr file.")
+            return False
+    return True
 
-if __name__ == '__main__':
-    main()
+def convert_zarr_to_tiff(zarr_dir, tiff_dir):
+    print(f"Original Zarr Directory: {zarr_dir}")
+    print(f"Original TIFF Directory: {tiff_dir}")
+    if not is_valid_zarr_directory(zarr_dir):
+        print("Invalid Zarr directory. Aborting conversion.")
+        return
+    tiff_dir = safe_makedirs(tiff_dir)
+    for image_name in os.listdir(zarr_dir):
+        image_path = os.path.join(zarr_dir, image_name)
+        if os.path.isdir(image_path):
+            zarr_input = os.path.join(image_path, f"{image_name}.zarr")
+            image_zarr = zarr.open(zarr_input, mode='r')
+            for i in range(image_zarr.shape[0]):
+                image_slice = image_zarr[i]
+                image_slice = (image_slice / np.max(image_slice) * 255).astype(np.uint8)
+                tiff_output_dir = os.path.join(tiff_dir, image_name)
+                tiff_output_dir = safe_makedirs(tiff_output_dir)
+                tifffile.imwrite(os.path.join(tiff_output_dir, f"{image_name}_{i:04d}.tiff"), image_slice)
+
+def setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag):
+    if dir_location.lower() == 'internal':
+        base_path = r'C:\Senior_Design'
+    elif dir_location.lower() == 'external':
+        base_path = r'D:\Senior_Design'
+    elif dir_location.lower() == 'cloud':
+        base_path = r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files'
+    elif dir_location.lower() == 'refine':
+        base_path = r'D:\Darren\Files'
+    else:
+        raise ValueError('Invalid directory location type')
+    
+    base_input_path = os.path.join(base_path, 'database')
+    base_output_path = os.path.join(base_path, 'outputs')
+    if output_to_cloud:
+        base_output_path = os.path.join(r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
+    base_weights_path = os.path.join(base_path, 'weights')
+
+    output_zarr_path = os.path.join(base_output_path, 'zarr', run_tag)
+    output_tiff_path = os.path.join(base_output_path, 'tiff', run_tag)
+    
+    if is_original_data:
+        input_path = os.path.join(base_input_path, 'orignal_dataset', 'grayscale', 'dataset')
+    else:
+        input_path = os.path.join(base_input_path, 'tablet_dataset', 'grayscale', 'dataset')
+
+    weights_path = os.path.join(base_weights_path, weights_tag)
+
+    print('Paths set')
+    return input_path, output_zarr_path, output_tiff_path, weights_path
+
+def run_inference(input_path, output_zarr_path, weights_path, name=None, target_particle_size=60, target_spacing=0.1, batch_size=6, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+    print(f"Running inference with the following settings:\n")
+    print(f"Input Path: {input_path}")
+    print(f"Output Path: {output_zarr_path}")
+    print(f"Model Path: {weights_path}")
+    print(f"Names: {name}")
+    print(f"Target Particle Size: {target_particle_size}")
+    print(f"Target Spacing: {target_spacing}")
+    print(f"Batch Size: {batch_size}")
+    print(f"Processes: {processes}")
+    print(f"Min Relative Particle Size: {min_rel_particle_size}")
+    print(f"Z-Score: {zscore}")
+    print(f"Folds: {folds}")
+
+    print("Inference process started...")
+
+    trainer, model, config = setup_model(weights_path, folds)
+    predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, zscore)
+    
+    print("Inference completed successfully!")
+
+def main(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag, name=None):
+    input_path, output_zarr_path, output_tiff_path, weights_path = setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
+
+    run_inference(input_path, output_zarr_path, weights_path, name)
+    convert_zarr_to_tiff(output_zarr_path, output_tiff_path)
+
+if __name__ == "__main__":
+    main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['3_SprayDriedDispersion'])
