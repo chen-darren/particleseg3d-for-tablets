@@ -24,6 +24,7 @@ from skimage import transform as ski_transform
 import tifffile
 import os
 from utils import darren_func as func
+import torch
 
 
 def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
@@ -47,17 +48,23 @@ def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV
     model = Nnunet(join(model_dir, trainer), folds=folds, nnunet_trainer=trainer, configuration="3d_fullres")
     model.eval()
 
-    # Use GPUs 0 and 1 with DDP strategy for efficient multi-GPU inference
-    trainer = pl.Trainer(
-        accelerator='gpu',  # Use the GPU accelerator
-        devices=[0, 1],  # Use GPUs 0 and 1
-        strategy="dp",  # Use DataParallel for multi-GPU
-        precision=16,  # Use mixed precision for faster inference
-        logger=False
-    )
-    
-    # # Use single GPU
-    # trainer = pl.Trainer(gpus=1, precision=16, logger=False)
+    num_gpus = torch.cuda.device_count()
+
+    if num_gpus > 1:
+        trainer = pl.Trainer(
+            accelerator="gpu",
+            devices=[0,1], # For REFINE which has two Quadro RTX 6000s and a third tiny GPU
+            strategy="dp",  # Use DataParallel for multi-GPU
+            precision=16,
+            logger=False
+        )
+    else:
+        trainer = pl.Trainer(
+            accelerator="gpu",
+            devices=1,
+            precision=16,
+            logger=False
+        )
 
     return trainer, model, config
 
