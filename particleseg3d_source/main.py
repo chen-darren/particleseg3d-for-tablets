@@ -545,14 +545,14 @@ def run_inference(input_path, output_zarr_path, weights_path, name=None, target_
     
     print("Inference completed successfully!")
 
-def main(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag, name=None):
+def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag, name=None):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
     run_inference(input_path, output_zarr_path, weights_path, name)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
-    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg')
-    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['1_Microsphere'])
-    main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['2_Tablet'])
-    # main(dir_location='refine', output_to_cloud=False, run_tag='pretrained_initial_tablet', is_original_data=False, weights_tag='original_particle_seg', name=['3_SprayDriedDispersion'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet')
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'])
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['2_Tablet'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'])
