@@ -1,4 +1,4 @@
-# Senior_Design
+# ParticleSeg3D Subprocess Module Implementation
 
 ## How to Run
 ### Configurables
