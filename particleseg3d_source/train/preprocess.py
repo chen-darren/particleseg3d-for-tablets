@@ -15,7 +15,7 @@ from typing import List, Tuple, Dict, Any
 
 def preprocess_all(load_dir: str, names: List[str], save_dir: str, target_spacing: float,
                    target_particle_size_in_pixel: int, dataset_name: str, processes: int,
-                   border_thickness_in_pixel: int, gpu: bool, zscore: Tuple[float, float]) -> None:
+                   border_thickness_in_pixel: int, gpu: bool, zscore: Tuple[float, float], run_tag: str) -> None:
     """
     Preprocesses all the samples in the dataset.
 
@@ -29,8 +29,10 @@ def preprocess_all(load_dir: str, names: List[str], save_dir: str, target_spacin
     :param border_thickness_in_pixel: Border thickness in pixel.
     :param gpu: Flag indicating whether to use the GPU for preprocessing.
     :param zscore: The z-score used for intensity normalization.
+    :param run_tag: The name of the run used for the output and .json file
     """
-    metadata_load_filepath = join(load_dir, "metadata.json")
+    # metadata_load_filepath = join(load_dir, "metadata.json")
+    metadata_load_filepath = join(load_dir, 'metadata', run_tag + '.json')
 
     with open(metadata_load_filepath) as f:
         metadata = json.load(f)
@@ -208,6 +210,7 @@ def main():
     parser.add_argument('-t', '--task', required=False, default=500, type=int, help="(Optional) The task id that should be assigned to this dataset.")
     parser.add_argument('-z', '--zscore', default=(5850.29762143569, 7078.294543817302), required=False, type=float, nargs=2,
                         help="(Optional) The target spacing in millimeters given as three numbers separate by spaces.")
+    parser.add_argument('-r', "--runtag", required=True, help="The name of the run used for the output and .json file.")
     parser.add_argument('-target_particle_size', default=60, required=False, type=int,
                         help="(Optional) The target particle size in pixels given as three numbers separate by spaces.")
     parser.add_argument('-target_spacing', default=0.1, required=False, type=float,
@@ -229,7 +232,7 @@ def main():
 
     dataset_name = "Task{}_ParticleSeg3D".format(str(args.task).zfill(3))
 
-    preprocess_all(args.input, names, args.output, args.target_spacing, args.target_particle_size, dataset_name, args.processes, args.thickness, not args.disable_gpu, args.zscore)
+    preprocess_all(args.input, names, args.output, args.target_spacing, args.target_particle_size, dataset_name, args.processes, args.thickness, not args.disable_gpu, args.zscore, args.runtag)
 
 
 if __name__ == '__main__':

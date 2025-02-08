@@ -55,7 +55,9 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
                     ├── Ore6.zarr
                     ├── Slag3.zarr
                     ├── ...
-                ├── metadata.json
+                ├── metadata
+                    ├── run_tag.json
+                    ├── ...
         ├── segmented
     ├── tablet_dataset
         ├── grayscale
@@ -65,7 +67,9 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
                     ├── 2_Tablet_Grayscale.zarr
                     ├── 3_SprayDriedDispersion_Grayscale.zarr
                     ├── ...
-                ├── metadata.json
+                ├── metadata
+                    ├── run_tag.json
+                    ├── ...
         ├── segmented
 ├── outputs
     ├── run_tag
