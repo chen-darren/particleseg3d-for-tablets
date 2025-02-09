@@ -25,7 +25,7 @@ import tifffile
 import os
 from utils import darren_func as func
 import torch
-
+import multiprocessing
 
 def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
@@ -198,7 +198,7 @@ def setup_folder_structure(
     return pred_softmax_filepath, pred_border_core_filepath, pred_border_core_tmp_filepath, pred_instance_filepath
 
 
-def predict(
+def predict( # Original
     load_filepath: str,
     pred_softmax_filepath: str,
     pred_border_core_filepath: str,
@@ -556,6 +556,8 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag, 
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
+    multiprocessing.set_start_method('spawn', force=True)
+
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet')
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'])
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['2_Tablet'])
@@ -563,5 +565,7 @@ if __name__ == "__main__":
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60')
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'])
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'])
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'])
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'])
+
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'])

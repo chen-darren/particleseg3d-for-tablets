@@ -1,6 +1,10 @@
 Things Needed
 - ParticleSeg3D
 	- Need Visual Studio Build Tools to install ParticleSeg3D
+	- pip install ParticleSeg3D
 - PyTorch with CUDA
 	- For multi-gpu, need libuv (v2.3.0) 
 - Numpy version 1.26.4 (or any <2)
+- P-Tqdm
+	- For tqdm of parallel processes
+	- conda install conda-forge::p-tqdm
