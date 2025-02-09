@@ -527,8 +527,9 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
+def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=2, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
