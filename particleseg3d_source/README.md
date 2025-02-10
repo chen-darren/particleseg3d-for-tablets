@@ -32,18 +32,17 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
     - Set `run_tag` to the identifier desired for the specified run and its outputs.
 6. Specify names of images (Optional)
     - Set `name` to the names of the desired images to be run. If nothing is passed, then automatically runs all images in the input directory.
+7. Specifiy type of strategy to use for multi-GPU processing (if at all)
+    - `'dp'` for DataParallel
+    - `'ddp'` for DistributedDataParallel with GLOO Backend (NCCL is not supported on Windows)
+    - `'singleGPU'` for no multi-GPU processing
 
 ### Ready to Go!
 - Can run `main.py` to perform inference.
 
 ## Important Notes
 - Anaconda and its virtual environments should be used.
-    - Packages Needed
-        - ParticleSeg3D
-            - Need Visual Studio Build Tools to install ParticleSeg3D
-        - PyTorch with CUDA
-            - For multi-gpu, need libuv (v2.3.0) 
-        - Numpy version 1.26.4 (or any <2)
+    - See `/conda_env/conda_env_source_notes.txt` for updated details
 - Root directory must be setup as follows:
 ```
 .
