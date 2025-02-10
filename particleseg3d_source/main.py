@@ -26,8 +26,9 @@ import os
 from utils import darren_func as func
 import torch
 import multiprocessing
+from pytorch_lightning.strategies import DDPStrategy
 
-def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
+def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
     Set up the model for inference with multi-GPU support.
 
@@ -50,11 +51,19 @@ def setup_model(model_dir: str, folds: List[int], trainer: str = "nnUNetTrainerV
 
     num_gpus = torch.cuda.device_count()
 
-    if num_gpus > 1:
+    if num_gpus > 1 and strategy.lower()=='db':
         trainer = pl.Trainer(
             accelerator="gpu",
             devices=[0,1], # For REFINE which has two Quadro RTX 6000s and a third tiny GPU
             strategy="dp",  # Use DataParallel for multi-GPU
+            precision=16,
+            logger=False
+        )
+    elif num_gpus > 1 and strategy.lower()=='ddb':
+        trainer = pl.Trainer(
+            accelerator="gpu",
+            devices=[0,1], # For REFINE which has two Quadro RTX 6000s and a third tiny GPU
+            strategy=DDPStrategy(process_group_backend="gloo"),
             precision=16,
             logger=False
         )
@@ -527,48 +536,55 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
-def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=int(multiprocessing.cpu_count()/2), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
+def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=int(multiprocessing.cpu_count()/2), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
     print(f"Model Path: {weights_path}")
     print(f"Names: {name}")
+    print(f"Run Tag: {run_tag}")
+    print(f"Strategy: {strategy}")
     print(f"Target Particle Size: {target_particle_size}")
     print(f"Target Spacing: {target_spacing}")
+
+    # Accounts for the different way DDB distributes for multi-GPU
+    if strategy.lower()=='ddb':
+        batch_size = int(batch_size/2)
     print(f"Batch Size: {batch_size}")
+    
     print(f"Processes: {processes}")
     print(f"Min Relative Particle Size: {min_rel_particle_size}")
     print(f"Z-Score: {zscore}")
     print(f"Folds: {folds}")
-    print(f"Run Tag: {run_tag}")
 
     print("Inference process started...")
 
-    trainer, model, config = setup_model(weights_path, folds)
+    trainer, model, config = setup_model(weights_path, folds, strategy)
     predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, zscore, run_tag)
     
     print("Inference completed successfully!")
 
-def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag, name=None):
+def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU'):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    run_inference(input_path, output_zarr_path, weights_path, name, run_tag)
+    run_inference(input_path, output_zarr_path, weights_path, run_tag, name, strategy)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
+    # strategy='dp'
+    strategy='ddb'
+    # strategy='singleGPU'
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet')
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'])
-    # main(di4r_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['2_Tablet'])
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'], strategy=strategy)
+    # main(di4r_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'], strategy=strategy)
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60')
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'])
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'])
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'], strategy=strategy)
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'])
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
