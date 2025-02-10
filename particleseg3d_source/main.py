@@ -527,9 +527,10 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
-def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=2, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=int(multiprocessing.cpu_count()/2), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag='No Run Tag Inputted', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=multiprocessing.cpu_count(), min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
@@ -554,7 +555,7 @@ def run_inference(input_path, output_zarr_path, weights_path, name=None, run_tag
 def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag, name=None):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    # run_inference(input_path, output_zarr_path, weights_path, name, run_tag)
+    run_inference(input_path, output_zarr_path, weights_path, name, run_tag)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
