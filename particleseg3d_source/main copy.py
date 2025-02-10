@@ -441,7 +441,7 @@ def save_prediction(
     source_spacing: Tuple[float, float, float]
 ) -> None:
     """
-    Save the predicted instances to a file with dtype=np.uint16.
+    Save the predicted instances to a file.
 
     Args:
         instance_pred: The predicted instances.
@@ -451,7 +451,7 @@ def save_prediction(
     Returns:
         None
     """
-    instance_pred_zarr = zarr.open(save_filepath + ".zarr", shape=instance_pred.shape, mode='w', dtype=np.uint16)
+    instance_pred_zarr = zarr.open(save_filepath + ".zarr", shape=instance_pred.shape, mode='w')
     instance_pred_zarr[...] = instance_pred
     instance_pred_zarr.attrs["spacing"] = source_spacing
 

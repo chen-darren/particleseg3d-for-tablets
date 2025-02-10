@@ -48,17 +48,53 @@ def is_valid_zarr_directory(zarr_dir, image_name=None):
             return False
     return True
 
+def remap_labels_visualization(image):
+    unique_labels = np.unique(image)  # Get unique labels
+    unique_labels = unique_labels[unique_labels != 0]  # Exclude background (assuming it's 0)
+
+    max_value = np.iinfo(image.dtype).max  # Get max value for dtype (e.g., 65535 for uint16)
+    new_labels = np.linspace(max_value-len(unique_labels), max_value, len(unique_labels), dtype=image.dtype)  # Create ascending values starting at max_value-len(unique labels)
+
+    # Create a mapping dictionary
+    label_map = {old: new for old, new in zip(unique_labels, new_labels)}
+
+    # Apply mapping
+    remapped_image = np.copy(image)
+    for old_label, new_label in label_map.items():
+        remapped_image[image == old_label] = new_label
+
+    return remapped_image
+
+def remap_labels_ascending(image):
+    unique_labels = np.unique(image)  # Get unique labels
+    unique_labels = unique_labels[unique_labels != 0]  # Exclude background (assuming it's 0)
+
+    max_value = np.iinfo(image.dtype).max  # Get max value for dtype (e.g., 65535 for uint16)
+    new_labels = np.linspace(1, max_value, len(unique_labels), dtype=image.dtype)  # Create ascending values starting at max_value-len(unique labels)
+
+    # Create a mapping dictionary
+    label_map = {old: new for old, new in zip(unique_labels, new_labels)}
+
+    # Apply mapping
+    remapped_image = np.copy(image)
+    for old_label, new_label in label_map.items():
+        remapped_image[image == old_label] = new_label
+
+    return remapped_image
+
+def remap_labels_binary(image):
+    # Convert image to binary (0 for background, 1 for foreground)
+    # This assumes the foreground is any non-zero value.
+
+    image = np.asarray(image) # Ensure the image is a numpy array
+
+    # Convert image to binary where non-zero values are set to max_value (e.g., 255 for uint8)
+    binary_image = np.where(image != 0, 255, 0).astype(np.uint8)
+
+    return binary_image
+
 def process_image_slice(image_slice, image, i, tiff_output_dir):
     """Process a single image slice and save it as a TIFF."""
-    if np.isnan(image_slice).any() or np.isinf(image_slice).any():
-        image_slice = np.nan_to_num(image_slice, nan=0.0, posinf=255, neginf=0)
-
-    max_val = np.max(image_slice)
-    if max_val > 0 and not np.isnan(max_val):
-        image_slice = (image_slice / max_val * 255).astype(np.uint8)
-    else:
-        image_slice = np.zeros_like(image_slice, dtype=np.uint8)
-
     tifffile.imwrite(os.path.join(tiff_output_dir, f"{image}_{i:04d}.tiff"), image_slice)
 
 def process_image(image, zarr_dir, tiff_dir):
@@ -71,10 +107,11 @@ def process_image(image, zarr_dir, tiff_dir):
         return
 
     image_zarr = zarr.open(zarr_input, mode='r')
+    image_zarr_remapped = remap_labels_binary(image_zarr)
     tiff_output_dir = safe_makedirs(os.path.join(tiff_dir, image))
 
-    for i in tqdm(range(image_zarr.shape[0]), desc=f"Converting {image}", leave=False):
-        process_image_slice(image_zarr[i], image, i, tiff_output_dir)
+    for i in tqdm(range(image_zarr_remapped.shape[0]), desc=f"Converting {image}", leave=False):
+        process_image_slice(image_zarr_remapped[i], image, i, tiff_output_dir)
 
 def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None):
     """Convert all Zarr images in a directory to TIFF format using multiprocessing with tqdm."""
