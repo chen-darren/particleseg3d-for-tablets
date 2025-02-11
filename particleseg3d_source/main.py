@@ -584,7 +584,7 @@ if __name__ == "__main__":
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'], strategy=strategy)
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)

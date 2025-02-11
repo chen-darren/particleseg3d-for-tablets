@@ -28,6 +28,6 @@ conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=
 conda install conda-forge::p-tqdm
 conda install conda-forge::pretty_errors
 pip install ParticleSeg3D
-conda install anaconda::ipykernel
-conda install conda-forge::napari
-conda install conda-forge::napari-animation
+conda install ipykernel
+pip install "napari[all]"
+pip install napari-animation
