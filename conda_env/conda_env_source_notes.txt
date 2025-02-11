@@ -14,10 +14,11 @@ Pretty Errors
 	- conda install conda-forge::pretty_errors
 - Python
 	- Use version 3.10
-- For TIFF viewer
-	- conda install anaconda::ipykernel
-	- conda install conda-forge::napari
-	- conda install conda-forge::napari-animation
+- For TIFF viewer and conversion to video
+	- conda install ipykernel
+	- pip install "napari[all]"
+	- pip install napari-animation
+	- conda install ffmpeg
 
 **Does not import correctly from YAML
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
@@ -32,3 +33,4 @@ pip install ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
 pip install napari-animation
+conda install ffmpeg
