@@ -51,7 +51,7 @@ def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', t
 
     num_gpus = torch.cuda.device_count()
 
-    if num_gpus > 1 and strategy.lower()=='db':
+    if num_gpus > 1 and strategy.lower()=='dp':
         trainer = pl.Trainer(
             accelerator="gpu",
             devices=[0,1], # For REFINE which has two Quadro RTX 6000s and a third tiny GPU
@@ -59,7 +59,7 @@ def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', t
             precision=16,
             logger=False
         )
-    elif num_gpus > 1 and strategy.lower()=='ddb':
+    elif num_gpus > 1 and strategy.lower()=='ddp':
         trainer = pl.Trainer(
             accelerator="gpu",
             devices=[0,1], # For REFINE which has two Quadro RTX 6000s and a third tiny GPU
@@ -550,8 +550,8 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
     print(f"Target Particle Size: {target_particle_size}")
     print(f"Target Spacing: {target_spacing}")
 
-    # Accounts for the different way DDB distributes for multi-GPU
-    if strategy.lower()=='ddb':
+    # Accounts for the different way ddp distributes for multi-GPU
+    if strategy.lower()=='ddp':
         batch_size = int(batch_size/2)
     print(f"Batch Size: {batch_size}")
     
@@ -575,8 +575,8 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
-    # strategy='dp'
-    strategy='ddb'
+    strategy='dp'
+    # strategy='ddp'
     # strategy='singleGPU'
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'], strategy=strategy)
@@ -584,7 +584,7 @@ if __name__ == "__main__":
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'], strategy=strategy)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'], strategy=strategy)
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
