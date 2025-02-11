@@ -20,10 +20,11 @@ Pretty Errors
 	- conda install conda-forge::napari-animation
 
 **Does not import correctly from YAML
+**When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
 
 To Set-Up on REFINE: copy and paste
-conda create -n Senior_Design_py310_source python=3.10
-conda activate Senior_Design_py310_source
+conda create -n Senior_Design_py310_refine python=3.10
+conda activate Senior_Design_py310_refine
 conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
 conda install conda-forge::p-tqdm
 conda install conda-forge::pretty_errors
