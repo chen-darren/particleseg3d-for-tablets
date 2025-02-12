@@ -5,6 +5,8 @@ from scipy.ndimage.filters import gaussian_filter
 from collections import defaultdict
 import copy
 import concurrent.futures
+import time
+import random
 
 
 class Aggregator:
@@ -146,7 +148,14 @@ class WeightedSoftmaxAggregator(WeightedAggregator):
         :param patch_indices: The patch indices in the format of (w_ini, w_fin, h_ini, h_fin, d_ini, d_fin, ...).
         """
         slices = self.get_slices(self.image, patch_indices)
-        self.image[slicer(self.image, slices)] += patch.astype(self.image.dtype) * self.weight_patch.astype(self.image.dtype)
+        for _ in range(50):  # Retry up to 50 times
+            try:
+                self.image[slicer(self.image, slices)] += patch.astype(self.image.dtype) * self.weight_patch.astype(self.image.dtype)
+                break  # Success, exit loop
+            except PermissionError:
+                # Generate a random sleep duration between 2 and 5 seconds in 0.1s increments
+                sleep_time = random.choice([i * 0.1 for i in range(20, 51)])
+                time.sleep(sleep_time) # Wait before retrying
 
     def get_output(self, patch_size=False, output=None):
         """
