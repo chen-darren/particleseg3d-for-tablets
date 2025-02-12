@@ -18,7 +18,6 @@ Things Needed
 	- conda install ipykernel
 - For TIFF viewer
 	- pip install "napari[all]"
-	- pip install napari-animation
 - For speeding up videos
 	- conda install -c conda-forge ffmpeg
 
@@ -26,13 +25,12 @@ Things Needed
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
 
 To Set-Up on REFINE: copy and paste
-conda create -n Senior_Design_py310_refine python=3.10
-conda activate Senior_Design_py310_refine
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
 conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
 conda install conda-forge::p-tqdm
 conda install conda-forge::pretty_errors
 pip install ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
-pip install napari-animation
 conda install -c conda-forge ffmpeg
