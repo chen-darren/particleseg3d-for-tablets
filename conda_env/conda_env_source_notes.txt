@@ -10,15 +10,17 @@ Things Needed
 - P-Tqdm
 	- For tqdm of parallel processes
 	- conda install conda-forge::p-tqdm
-Pretty Errors
+- Pretty Errors
 	- conda install conda-forge::pretty_errors
 - Python
 	- Use version 3.10
-- For TIFF viewer and conversion to video
+- For Jupyter
 	- conda install ipykernel
+- For TIFF viewer
 	- pip install "napari[all]"
 	- pip install napari-animation
-	- conda install ffmpeg
+- For speeding up videos
+	- conda install -c conda-forge ffmpeg
 
 **Does not import correctly from YAML
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
@@ -33,4 +35,4 @@ pip install ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
 pip install napari-animation
-conda install ffmpeg
+conda install -c conda-forge ffmpeg
