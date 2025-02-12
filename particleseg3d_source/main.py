@@ -536,9 +536,9 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=2, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
@@ -585,10 +585,10 @@ if __name__ == "__main__":
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
     
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_tab40', name=['2_Tablet'], strategy=strategy)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_tab50', name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_tab50', name=['2_Tablet'], strategy=strategy)
