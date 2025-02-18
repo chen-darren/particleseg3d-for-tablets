@@ -118,12 +118,13 @@ def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None):
     print(f"Zarr Directory: {zarr_dir}")
     print(f"TIFF Directory: {tiff_dir}")
 
-    if not is_valid_zarr_directory(zarr_dir, image_name):
-        print("Invalid Zarr directory. Aborting conversion.")
-        return
-
     safe_makedirs(tiff_dir)
     image_list = image_name if image_name is not None else os.listdir(zarr_dir)
+
+    for img in image_list:
+        if not is_valid_zarr_directory(zarr_dir, img):
+            print(f"Invalid Zarr directory for {img}. Aborting conversion.")
+            return
 
     p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=multiprocessing.cpu_count())
     # p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=32)
