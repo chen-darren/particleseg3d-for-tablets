@@ -103,7 +103,7 @@ def process_image(image, zarr_dir, tiff_dir):
     zarr_input = os.path.join(image_path, f"{image}.zarr")
 
     if not os.path.exists(zarr_input):
-        print(f"Skipping {image}: Zarr file not found.")
+        print(f"\nSkipping {image}: Zarr file not found.")
         return
 
     image_zarr = zarr.open(zarr_input, mode='r')
@@ -121,10 +121,7 @@ def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None):
     safe_makedirs(tiff_dir)
     image_list = image_name if image_name is not None else os.listdir(zarr_dir)
 
-    for img in image_list:
-        if not is_valid_zarr_directory(zarr_dir, img):
-            print(f"Invalid Zarr directory for {img}. Aborting conversion.")
-            return
+    is_valid_zarr_directory(zarr_dir, image_list)
 
     p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=multiprocessing.cpu_count())
     # p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=32)
