@@ -594,6 +594,6 @@ if __name__ == "__main__":
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_gen35_clar35', name=['4_GenericD12'], strategy=strategy)
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_gen35_clar35', name=['5_ClaritinD12'], strategy=strategy)
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc35', name=['6_30pWTMCC'], strategy=strategy)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc40', name=['6_30pWTMCC'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc35', name=['6_30pWTMCC'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc40', name=['6_30pWTMCC'], strategy=strategy)
 
