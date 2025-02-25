@@ -30,12 +30,16 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
     - Set `weights_tag` to the correct name of the weights that are desired. If the originally trained model is desired, set to `'original_particle_seg'`.
 5. Specify run tag
     - Set `run_tag` to the identifier desired for the specified run and its outputs.
-6. Specify names of images (Optional)
+6. Specify metadata
+    - Set `metadata` to the identifier for the desired .json file (i.e. `tab40_gen35_clar35`). Defaults to `metadata` for `metadata.json`.
+7. Specify names of images (Optional)
     - Set `name` to the names of the desired images to be run. If nothing is passed, then automatically runs all images in the input directory.
-7. Specifiy type of strategy to use for multi-GPU processing (if at all)
+8. Specifiy type of strategy to use for multi-GPU processing (if at all)
     - `'dp'` for DataParallel
     - `'ddp'` for DistributedDataParallel with GLOO Backend (NCCL is not supported on Windows)
     - `'singleGPU'` for no multi-GPU processing
+9. Specify the Z-Score desired
+    - Set `zscore` to the desired tuple containing `(mean, std)`. Defaults to the original from the ParticleSeg3D paper.
 
 ### Ready to Go!
 - Can run `main.py` to perform inference.

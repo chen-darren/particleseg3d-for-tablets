@@ -91,7 +91,8 @@ def predict_cases(
     processes: int,
     min_rel_particle_size: float,
     zscore: Tuple[float, float],
-    run_tag: str
+    run_tag: str,
+    metadata: str
 ) -> None:
     """
     Perform inference on multiple cases.
@@ -109,11 +110,11 @@ def predict_cases(
         processes: The number of processes to use for parallel processing.
         min_rel_particle_size: The minimum relative particle size used for filtering.
         zscore: The z-score used for intensity normalization.
-        run_tag: The name of the run used for the output and .json file
+        run_tag: The name of the run used for the output.
+        metadata: The name of the .json file for the metadata.
     """
     image_dir = join(load_dir, "images")
-    # metadata_load_filepath = join(load_dir, "metadata.json")
-    metadata_filepath = join(load_dir, 'metadata', run_tag + '.json')
+    metadata_filepath = join(load_dir, 'metadata', metadata + '.json')
 
     target_particle_size = [target_particle_size] * 3
     target_spacing = [target_spacing] * 3
@@ -539,13 +540,14 @@ def compute_patch_size(
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
 # def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
+def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
     print(f"Model Path: {weights_path}")
     print(f"Names: {name}")
     print(f"Run Tag: {run_tag}")
+    print(f"Metadata: {metadata}")
     print(f"Strategy: {strategy}")
     print(f"Target Particle Size: {target_particle_size}")
     print(f"Target Spacing: {target_spacing}")
@@ -563,37 +565,43 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
     print("Inference process started...")
 
     trainer, model, config = setup_model(weights_path, folds, strategy)
-    predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, zscore, run_tag)
+    predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, zscore, run_tag, metadata)
     
     print("Inference completed successfully!")
 
-def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU'):
+def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', zscore=(5850.29762143569, 7078.294543817302)):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    run_inference(input_path, output_zarr_path, weights_path, run_tag, name, strategy)
+    run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy, zscore=zscore)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
+    weights_tag = 'original_particle_seg'
+    metadata = 'tab40_gen35_clar35'
+    
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['1_Microsphere'], strategy=strategy)
-    # main(di4r_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['2_Tablet'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_initial_tablet', name=['3_SprayDriedDispersion'], strategy=strategy)
-
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['1_Microsphere'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['2_Tablet'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mic50_tab30_spray60', name=['3_SprayDriedDispersion'], strategy=strategy)
-
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_misc', name=['2_Tablet'], strategy=strategy)
+    # zscore = (5850.29762143569, 7078.294543817302) # Original
+    # zscore = (12672.926825743256, 6804.36077846359) # 2_Tablet
+    # zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
+    # zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
+    # zscore = (11772.300471540886, 7679.218609270373) # 2_Tablet and 4_GenericD12
+    # zscore = (9751.242425435075, 7451.459289409856) # 2_Tablet and 5_ClaritinD12
+    # zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
     
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_tab20', name=['2_Tablet'], strategy=strategy)
-    
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_gen35_clar35', name=['4_GenericD12'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_gen35_clar35', name=['5_ClaritinD12'], strategy=strategy)
+    zscore = (12672.926825743256, 6804.36077846359) # 2_Tablet
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_zscore2', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc35', name=['6_30pWTMCC'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag='original_particle_seg', run_tag='pretrained_mcc40', name=['6_30pWTMCC'], strategy=strategy)
+    zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
 
+    zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
+
+    zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
