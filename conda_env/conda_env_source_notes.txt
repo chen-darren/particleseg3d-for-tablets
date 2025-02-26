@@ -20,6 +20,7 @@ Things Needed
 	- pip install "napari[all]"
 - For speeding up videos
 	- conda install -c conda-forge ffmpeg
+- For showing images from ratio_detected.ipynb
 
 **Does not import correctly from YAML
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
@@ -34,3 +35,4 @@ pip install ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
 conda install -c conda-forge ffmpeg
+conda install conda-forge::matplotlib
