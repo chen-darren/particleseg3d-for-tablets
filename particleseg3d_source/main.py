@@ -558,10 +558,10 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
-def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):    
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
@@ -599,13 +599,13 @@ if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
     weights_tag = 'original_particle_seg'
     # metadata = 'tab40_gen35_clar35'
-    metadata = 'pretrained_tab50'
+    metadata = 'pretrained_tab60'
     
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab50_speed', metadata=metadata, name=['2_Tablet'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc', metadata=metadata, name=['2_Tablet'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
 

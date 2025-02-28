@@ -11,7 +11,23 @@ from skimage.morphology import cube, footprint_rectangle
 from skimage.morphology import dilation
 from scipy.ndimage.morphology import distance_transform_edt
 from typing import Tuple, Optional, Type
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from itertools import islice
+
+
+def chunkify(iterable, size):
+    iterator = iter(iterable)
+    while chunk := list(islice(iterator, size)):
+        yield chunk
+
+
+def process_in_chunks(patches, processes, chunk_size=10):
+    with ProcessPoolExecutor(max_workers=processes) as executor:
+        results = []
+        for chunk in tqdm(chunkify(patches, chunk_size), total=len(patches) // chunk_size, desc="Processing Chunks"):
+            results.extend(executor.map(border_core_component2instance_dilation, chunk))
+    return results
+
 
 def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath: str, processes: Optional[int] = None, progressbar: bool = True, dtype: Type = np.uint16) -> Tuple[np.ndarray, int]:
     """
@@ -62,9 +78,11 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
             border_core_patch[filter_mask != 1] = 0
             border_core_patches.append(border_core_patch)
 
-        # instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
-        with ProcessPoolExecutor(max_workers=processes) as executor:
-            instances_patches = list(tqdm(executor.map(border_core_component2instance, border_core_patches), total=len(border_core_patches), desc="Border-Core2Instance", disable=not progressbar))
+        # Various methods of parallel processing
+        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
+        # with ProcessPoolExecutor(max_workers=processes) as executor:
+        #     instances_patches = list(tqdm(executor.map(border_core_component2instance, border_core_patches), total=len(border_core_patches), desc="Border-Core2Instance", disable=not progressbar))
+        # instances_patches = process_in_chunks(border_core_patches, processes, chunk_size=24)
 
         for index, (label, bbox) in enumerate(tqdm(props.items())):
             instances_patch = instances_patches[index].astype(dtype)
