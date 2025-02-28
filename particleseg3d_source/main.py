@@ -27,6 +27,7 @@ from utils import darren_func as func
 import torch
 import multiprocessing
 from pytorch_lightning.strategies import DDPStrategy
+import dask.array as da
 
 def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
@@ -78,6 +79,25 @@ def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', t
     return trainer, model, config
 
 
+def global_mean_std(zarr_path):
+    """
+    Compute the global mean and standard deviation of a Zarr dataset efficiently using Dask.
+    
+    Parameters:
+        zarr_path (str): Path to the Zarr file.
+    
+    Returns:
+        tuple: (global_mean, global_std)
+    """
+    # Open the Zarr file using Dask
+    zarr_data = da.from_zarr(zarr_path)
+    
+    # Compute global mean and standard deviation using Dask's lazy evaluation
+    global_mean = zarr_data.mean().compute()
+    global_std = zarr_data.std().compute()
+    
+    return global_mean, global_std
+
 
 def predict_cases(
     load_dir: str,
@@ -91,7 +111,6 @@ def predict_cases(
     batch_size: int,
     processes: int,
     min_rel_particle_size: float,
-    zscore: Tuple[float, float],
     run_tag: str,
     metadata: str
 ) -> None:
@@ -110,7 +129,6 @@ def predict_cases(
         batch_size: The batch size to use during inference.
         processes: The number of processes to use for parallel processing.
         min_rel_particle_size: The minimum relative particle size used for filtering.
-        zscore: The z-score used for intensity normalization.
         run_tag: The name of the run used for the output.
         metadata: The name of the .json file for the metadata.
     """
@@ -126,6 +144,10 @@ def predict_cases(
     print("Samples: ", names)
 
     for name in tqdm(names, desc="Inference Query"):
+        global_mean, global_std = global_mean_std(os.path.join(image_dir, name + '.zarr'))
+        zscore = (global_mean, global_std)
+        print(f'Global Mean of {name}: {global_mean}')
+        print(f'Global Standard Deviation of {name}: {global_std}')
         predict_case(image_dir, save_dir, name, metadata_filepath, zscore, trainer, model, config, target_particle_size, target_spacing, processes, min_rel_particle_size, batch_size)
 
 
@@ -538,10 +560,10 @@ def compute_patch_size(
     source_patch_size_in_pixel = np.rint(target_patch_size_in_pixel * size_conversion_factor).astype(int)
     return target_patch_size_in_pixel, source_patch_size_in_pixel, size_conversion_factor
 
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):
-def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, zscore=(5850.29762143569, 7078.294543817302), folds=(0, 1, 2, 3, 4)):    
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=0, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=4, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+# def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=8, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):
+def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', target_particle_size=60, target_spacing=0.1, batch_size=24, processes=16, min_rel_particle_size=0.005, folds=(0, 1, 2, 3, 4)):    
     print(f"Running inference with the following settings:\n")
     print(f"Input Path: {input_path}")
     print(f"Output Path: {output_zarr_path}")
@@ -560,20 +582,19 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
     
     print(f"Processes: {processes}")
     print(f"Min Relative Particle Size: {min_rel_particle_size}")
-    print(f"Z-Score: {zscore}")
     print(f"Folds: {folds}")
 
     print("Inference process started...")
 
     trainer, model, config = setup_model(weights_path, folds, strategy)
-    predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, zscore, run_tag, metadata)
+    predict_cases(input_path, output_zarr_path, name, trainer, model, config, target_particle_size, target_spacing, batch_size, processes, min_rel_particle_size, run_tag, metadata)
     
     print("Inference completed successfully!")
 
-def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', zscore=(5850.29762143569, 7078.294543817302)):
+def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU'):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy, zscore=zscore)
+    run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy)
     func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
 
 if __name__ == "__main__":
@@ -586,24 +607,12 @@ if __name__ == "__main__":
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
 
-    # zscore = (5850.29762143569, 7078.294543817302) # Original
-    # zscore = (12672.926825743256, 6804.36077846359) # 2_Tablet
-    # zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
-    # zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
-    # zscore = (11772.300471540886, 7679.218609270373) # 2_Tablet and 4_GenericD12
-    # zscore = (9751.242425435075, 7451.459289409856) # 2_Tablet and 5_ClaritinD12
-    # zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
-    
-    zscore = (12672.926825743256, 6804.36077846359) # 2_Tablet
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab50_speed', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab50_speed', metadata=metadata, name=['2_Tablet'], strategy=strategy)
 
-    # zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
 
-    # zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy)
 
-    # zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy)
