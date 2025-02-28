@@ -146,8 +146,6 @@ def predict_cases(
     for name in tqdm(names, desc="Inference Query"):
         global_mean, global_std = global_mean_std(os.path.join(image_dir, name + '.zarr'))
         zscore = (global_mean, global_std)
-        print(f'Global Mean of {name}: {global_mean}')
-        print(f'Global Standard Deviation of {name}: {global_std}')
         predict_case(image_dir, save_dir, name, metadata_filepath, zscore, trainer, model, config, target_particle_size, target_spacing, processes, min_rel_particle_size, batch_size)
 
 
