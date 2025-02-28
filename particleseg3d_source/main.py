@@ -78,6 +78,7 @@ def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', t
     return trainer, model, config
 
 
+
 def predict_cases(
     load_dir: str,
     save_dir: str,
@@ -578,7 +579,8 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
     weights_tag = 'original_particle_seg'
-    metadata = 'tab40_gen35_clar35'
+    # metadata = 'tab40_gen35_clar35'
+    metadata = 'pretrained_tab50'
     
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
@@ -593,15 +595,15 @@ if __name__ == "__main__":
     # zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
     
     zscore = (12672.926825743256, 6804.36077846359) # 2_Tablet
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_zscore2', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab50_speed', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
 
-    zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
+    # zscore = (11041.960587417172, 8249.51640249003) # 4_GenericD12
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
 
-    zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
+    # zscore = (7688.606097205822, 7194.162075529207) # 5_ClaritinD12
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
 
-    zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)
+    # zscore = (10187.357283236743, 7754.401858073352) # 2_Tablet, 4_GenericD12, and 5_ClaritinD12
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy, zscore=zscore)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy, zscore=zscore)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, zscore=zscore)

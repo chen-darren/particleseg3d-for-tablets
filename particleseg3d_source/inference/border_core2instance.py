@@ -11,7 +11,7 @@ from skimage.morphology import cube, footprint_rectangle
 from skimage.morphology import dilation
 from scipy.ndimage.morphology import distance_transform_edt
 from typing import Tuple, Optional, Type
-
+from concurrent.futures import ProcessPoolExecutor
 
 def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath: str, processes: Optional[int] = None, progressbar: bool = True, dtype: Type = np.uint16) -> Tuple[np.ndarray, int]:
     """
@@ -62,7 +62,9 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
             border_core_patch[filter_mask != 1] = 0
             border_core_patches.append(border_core_patch)
 
-        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
+        # instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
+        with ProcessPoolExecutor(max_workers=processes) as executor:
+            instances_patches = list(tqdm(executor.map(border_core_component2instance, border_core_patches), total=len(border_core_patches), desc="Border-Core2Instance", disable=not progressbar))
 
         for index, (label, bbox) in enumerate(tqdm(props.items())):
             instances_patch = instances_patches[index].astype(dtype)
