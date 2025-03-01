@@ -21,6 +21,8 @@ Things Needed
 - For speeding up videos
 	- conda install -c conda-forge ffmpeg
 - For showing images from ratio_detected.ipynb
+- For data augmentation
+	- conda install conda-forge::albumentations
 
 **Does not import correctly from YAML
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
@@ -36,3 +38,4 @@ conda install ipykernel
 pip install "napari[all]"
 conda install -c conda-forge ffmpeg
 conda install conda-forge::matplotlib
+conda install conda-forge::albumentations
