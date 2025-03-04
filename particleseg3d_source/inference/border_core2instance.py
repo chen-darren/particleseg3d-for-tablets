@@ -29,7 +29,9 @@ def process_in_chunks(patches, processes, chunk_size=10):
     return results
 
 
-def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath: str, processes: Optional[int] = None, progressbar: bool = True, dtype: Type = np.uint16) -> Tuple[np.ndarray, int]:
+def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath: str, 
+                         processes: Optional[int] = None, progressbar: bool = True, 
+                         dtype: Type = np.uint16, use_tempfile: bool = True) -> Tuple[np.ndarray, int]:
     """
     Convert the border-core segmentation of an entire image into an instance segmentation.
 
@@ -39,22 +41,27 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
         processes (Optional[int], default=None): Number of processes to use. If None, it uses a single process.
         progressbar (bool, default=True): Whether to show progress bar.
         dtype (Type, default=np.uint16): The data type for the output segmentation.
+        use_tempfile (bool, default=True): If True, uses a temporary Zarr file to store intermediate results 
+                                           to save memory. If False, keeps everything in RAM.
 
     Returns:
         Tuple[np.ndarray, int]: The instance segmentation of the entire image, Number of instances.
     """
 
     border_core_array = np.array(border_core)
-    component_seg = cc3d.connected_components(border_core_array > 0)
-    component_seg = component_seg.astype(dtype)
+    component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype)
     instances = np.zeros_like(border_core, dtype=dtype)
     num_instances = 0
-    props = {i: bbox for i, bbox in enumerate(cc3d.statistics(component_seg)["bounding_boxes"])}
-    del props[0]
-    component_seg = zarr.array(component_seg, chunks=(100, 100, 100))
-    zarr.save(pred_border_core_tmp_filepath, component_seg)
+    props = {i: bbox for i, bbox in enumerate(cc3d.statistics(component_seg)["bounding_boxes"]) if i != 0}
 
-    component_seg = zarr.open(pred_border_core_tmp_filepath, mode='r')
+    if use_tempfile:
+        # Save to temporary Zarr file for memory efficiency
+        component_seg = zarr.array(component_seg, chunks=(100, 100, 100))
+        zarr.save(pred_border_core_tmp_filepath, component_seg)
+        component_seg = zarr.open(pred_border_core_tmp_filepath, mode='r')
+    else:
+        # Keep in RAM for faster access
+        component_seg = np.array(component_seg)  # Ensures it's in RAM
 
     border_core_component2instance = border_core_component2instance_dilation
 
@@ -78,11 +85,8 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
             border_core_patch[filter_mask != 1] = 0
             border_core_patches.append(border_core_patch)
 
-        # Various methods of parallel processing
-        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
-        # with ProcessPoolExecutor(max_workers=processes) as executor:
-        #     instances_patches = list(tqdm(executor.map(border_core_component2instance, border_core_patches), total=len(border_core_patches), desc="Border-Core2Instance", disable=not progressbar))
-        # instances_patches = process_in_chunks(border_core_patches, processes, chunk_size=24)
+        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, 
+                                  desc="Border-Core2Instance", disable=not progressbar)
 
         for index, (label, bbox) in enumerate(tqdm(props.items())):
             instances_patch = instances_patches[index].astype(dtype)

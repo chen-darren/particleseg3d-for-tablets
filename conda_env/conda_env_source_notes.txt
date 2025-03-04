@@ -21,6 +21,7 @@ Things Needed
 - For showing images from ratio_detected.ipynb
 - For semantic to instance
 	- pip3 install opencv-python
+	- pip install imagecodecs
 
 **Does not import correctly from YAML
 **When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
@@ -36,3 +37,4 @@ conda install ipykernel
 pip install "napari[all]"
 conda install conda-forge::matplotlib
 pip3 install opencv-python
+pip install imagecodecs
