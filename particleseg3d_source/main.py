@@ -605,7 +605,7 @@ if __name__ == "__main__":
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc', metadata=metadata, name=['2_Tablet'], strategy=strategy)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy)
 
     # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
 

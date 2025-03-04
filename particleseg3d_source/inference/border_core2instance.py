@@ -31,7 +31,7 @@ def process_in_chunks(patches, processes, chunk_size=10):
 
 def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath: str, 
                          processes: Optional[int] = None, progressbar: bool = True, 
-                         dtype: Type = np.uint16, use_tempfile: bool = True) -> Tuple[np.ndarray, int]:
+                         dtype: Type = np.uint16, use_tempfile: bool = False) -> Tuple[np.ndarray, int]:
     """
     Convert the border-core segmentation of an entire image into an instance segmentation.
 
