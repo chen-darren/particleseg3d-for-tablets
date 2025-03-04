@@ -15,7 +15,7 @@ from typing import List, Tuple, Dict, Any
 
 def preprocess_all(load_dir: str, names: List[str], save_dir: str, target_spacing: float,
                    target_particle_size_in_pixel: int, dataset_name: str, processes: int,
-                   border_thickness_in_pixel: int, gpu: bool, zscore: Tuple[float, float], run_tag: str) -> None:
+                   border_thickness_in_pixel: int, gpu: bool, zscore: Tuple[float, float]) -> None:
     """
     Preprocesses all the samples in the dataset.
 
@@ -29,10 +29,8 @@ def preprocess_all(load_dir: str, names: List[str], save_dir: str, target_spacin
     :param border_thickness_in_pixel: Border thickness in pixel.
     :param gpu: Flag indicating whether to use the GPU for preprocessing.
     :param zscore: The z-score used for intensity normalization.
-    :param run_tag: The name of the run used for the output and .json file
     """
-    # metadata_load_filepath = join(load_dir, "metadata.json")
-    metadata_load_filepath = join(load_dir, 'metadata', run_tag + '.json')
+    metadata_load_filepath = join(load_dir, "metadata.json")
 
     with open(metadata_load_filepath) as f:
         metadata = json.load(f)
@@ -216,7 +214,7 @@ def main():
     parser.add_argument('-target_spacing', default=0.1, required=False, type=float,
                         help="(Optional) The target spacing in millimeters given as three numbers separate by spaces.")
     parser.add_argument('-p', '--processes', required=False, default=None, type=int, help="(Optional) Number of processes to use for parallel processing. None to disable multiprocessing.")
-    parser.add_argument('-thickness', required=False, default=3, type=int, help="(Optional) Border thickness in pixel.")
+    parser.add_argument('-thickness', required=False, default=1, type=int, help="(Optional) Border thickness in pixel.")
     parser.add_argument('--disable_gpu', required=False, default=False, action="store_true", help="(Optional) Disables use of the GPU for preprocessing.")
     args = parser.parse_args()
 
