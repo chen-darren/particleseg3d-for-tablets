@@ -20,7 +20,6 @@ Things Needed
 	- pip install "napari[all]"
 - For showing images from ratio_detected.ipynb
 - For semantic to instance
-	- pip3 install opencv-python
 	- pip install imagecodecs
 		- Be sure to disconnect and reconnect kernel
 
@@ -37,5 +36,4 @@ pip install ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
 conda install conda-forge::matplotlib
-pip3 install opencv-python
 pip install imagecodecs
