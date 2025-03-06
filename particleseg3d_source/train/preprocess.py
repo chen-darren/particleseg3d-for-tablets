@@ -214,7 +214,7 @@ def main():
     parser.add_argument('-target_spacing', default=0.1, required=False, type=float,
                         help="(Optional) The target spacing in millimeters given as three numbers separate by spaces.")
     parser.add_argument('-p', '--processes', required=False, default=None, type=int, help="(Optional) Number of processes to use for parallel processing. None to disable multiprocessing.")
-    parser.add_argument('-thickness', required=False, default=1, type=int, help="(Optional) Border thickness in pixel.")
+    parser.add_argument('-thickness', required=False, default=2, type=int, help="(Optional) Border thickness in pixel.")
     parser.add_argument('--disable_gpu', required=False, default=False, action="store_true", help="(Optional) Disables use of the GPU for preprocessing.")
     args = parser.parse_args()
 
