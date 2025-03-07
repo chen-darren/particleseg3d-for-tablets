@@ -38,16 +38,47 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
         return image
 
     image = torch.from_numpy(image[np.newaxis, np.newaxis, ...].astype(np.float32))
-    with torch.no_grad():
-        if gpu:
-            image = image.cuda()
-        if not seg:
-            image = functional.interpolate(image, target_shape, mode='trilinear')
+    # with torch.no_grad():
+    #     if gpu:
+    #         image = image.cuda()
+    #     if not seg:
+    #         image = functional.interpolate(image, target_shape, mode='trilinear')
+    #     else:
+    #         if not smooth_seg:
+    #             image = functional.interpolate(image, target_shape, mode='nearest')
+    #         else:
+    #             image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+
+    # Determine whether to use GPU
+    if gpu and torch.cuda.is_available():
+        device = torch.device("cuda")
+        image = image.to(device)
+
+        # If multiple GPUs, use DataParallel
+        if torch.cuda.device_count() > 1:
+            print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
+            resample_fn = torch.nn.DataParallel(functional.interpolate, device_ids=[0, 1])
         else:
-            if not smooth_seg:
-                image = functional.interpolate(image, target_shape, mode='nearest')
+            resample_fn = functional.interpolate
+
+        with torch.no_grad():
+            if not seg:
+                image = resample_fn(image, size=target_shape, mode='trilinear', align_corners=False)
             else:
-                image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+                if not smooth_seg:
+                    image = resample_fn(image, size=target_shape, mode='nearest')
+                else:
+                    image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+
+    else:  # If GPU is disabled or unavailable, run on CPU
+        with torch.no_grad():
+            if not seg:
+                image = F.interpolate(image, size=target_shape, mode='trilinear', align_corners=False)
+            else:
+                if not smooth_seg:
+                    image = F.interpolate(image, size=target_shape, mode='nearest')
+                else:
+                    image = resample_seg_smooth(image, target_shape, processes, desc, disable)
 
     image = image.cpu().numpy()[0][0]
     torch.cuda.empty_cache()
