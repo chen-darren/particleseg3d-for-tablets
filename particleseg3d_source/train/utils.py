@@ -10,11 +10,18 @@ import shutil
 import sys
 import numpy as np
 import torch
+import torch.nn as nn
 from torch import optim
 import SimpleITK as sitk
 from os.path import join
 from natsort import natsorted
 
+class InterpolateModule(nn.Module):
+    def __init__(self):
+        super(InterpolateModule, self).__init__()
+
+    def forward(self, input, size, mode='trilinear', align_corners=False):
+        return functional.interpolate(input=input, size=size, mode=mode, align_corners=align_corners)
 
 def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu: bool = True,
              smooth_seg: bool = True, processes: int = None, desc: str = None, disable: bool = True) -> np.ndarray:
@@ -56,27 +63,26 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
 
         # If multiple GPUs, use DataParallel
         if torch.cuda.device_count() > 1:
-            print(f"Using {torch.cuda.device_count()} GPUs with DataParallel")
-            resample_fn = torch.nn.DataParallel(functional.interpolate, device_ids=[0, 1])
+            resample_fn = torch.nn.DataParallel(InterpolateModule(), device_ids=[0, 1])
         else:
             resample_fn = functional.interpolate
 
         with torch.no_grad():
             if not seg:
-                image = resample_fn(image, size=target_shape, mode='trilinear', align_corners=False)
+                image = resample_fn(input=image, size=target_shape, mode='trilinear', align_corners=False)
             else:
                 if not smooth_seg:
-                    image = resample_fn(image, size=target_shape, mode='nearest')
+                    image = resample_fn(input=image, size=target_shape, mode='nearest')
                 else:
                     image = resample_seg_smooth(image, target_shape, processes, desc, disable)
 
     else:  # If GPU is disabled or unavailable, run on CPU
         with torch.no_grad():
             if not seg:
-                image = F.interpolate(image, size=target_shape, mode='trilinear', align_corners=False)
+                image = functional.interpolate(image, size=target_shape, mode='trilinear', align_corners=False)
             else:
                 if not smooth_seg:
-                    image = F.interpolate(image, size=target_shape, mode='nearest')
+                    image = functional.interpolate(image, size=target_shape, mode='nearest')
                 else:
                     image = resample_seg_smooth(image, target_shape, processes, desc, disable)
 
