@@ -2,6 +2,7 @@ Things Needed
 - ParticleSeg3D
 	- Need Visual Studio Build Tools to install ParticleSeg3D
 	- pip install ParticleSeg3D
+	- pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 - PyTorch with CUDA
 	- For multi-gpu, need libuv (v2.3.0) 
 - Numpy version 1.24.3 or 1.26.4 (or any <2)
@@ -34,6 +35,7 @@ conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=
 conda install conda-forge::p-tqdm
 conda install conda-forge::pretty_errors
 pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
 conda install conda-forge::matplotlib
