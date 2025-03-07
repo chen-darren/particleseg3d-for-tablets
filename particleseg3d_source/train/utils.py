@@ -16,12 +16,42 @@ import SimpleITK as sitk
 from os.path import join
 from natsort import natsorted
 
-class InterpolateModule(nn.Module):
-    def __init__(self):
-        super(InterpolateModule, self).__init__()
+# class InterpolateModule(nn.Module):
+#     def __init__(self):
+#         super(InterpolateModule, self).__init__()
 
-    def forward(self, input, size, mode='trilinear', align_corners=False):
-        return functional.interpolate(input=input, size=size, mode=mode, align_corners=align_corners)
+#     def forward(self, input, size, mode='trilinear', align_corners=False):
+#         return functional.interpolate(input=input, size=size, mode=mode, align_corners=align_corners)
+    
+# class ResampleSegSmoothModule(nn.Module):
+#     def __init__(self, target_shape: Tuple[int], processes: int, desc: str, disable: bool):
+#         super(ResampleSegSmoothModule, self).__init__()
+#         self.target_shape = target_shape
+#         self.processes = processes
+#         self.desc = desc
+#         self.disable = disable
+
+#     def forward(self, seg: torch.Tensor) -> torch.Tensor:
+#         target_shape_tmp = np.asarray(seg.shape)
+#         target_shape_tmp[2:] = np.asarray(self.target_shape)
+#         target_shape_tmp = tuple(target_shape_tmp)
+#         reshaped = torch.zeros(target_shape_tmp, dtype=seg.dtype, device=seg.device)
+#         unique_labels = torch.unique(seg, sorted=True)
+
+#         if self.processes is None:
+#             for i, label in enumerate(tqdm(unique_labels, desc=self.desc, disable=self.disable)):
+#                 mask = seg == label
+#                 reshaped_multihot = functional.interpolate(mask.float(), self.target_shape, mode='trilinear')
+#                 reshaped[reshaped_multihot >= 0.5] = label
+#         else:
+#             reshaped_multihot_tensors = ptqdm(_resample_seg_smooth, unique_labels, self.processes, 
+#                                               desc=self.desc, disable=self.disable, seg=seg, 
+#                                               target_shape=self.target_shape)
+
+#             for i, label in enumerate(unique_labels):
+#                 reshaped[reshaped_multihot_tensors[i] >= 0.5] = label
+
+#         return reshaped
 
 def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu: bool = True,
              smooth_seg: bool = True, processes: int = None, desc: str = None, disable: bool = True) -> np.ndarray:
@@ -45,46 +75,46 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
         return image
 
     image = torch.from_numpy(image[np.newaxis, np.newaxis, ...].astype(np.float32))
-    # with torch.no_grad():
-    #     if gpu:
-    #         image = image.cuda()
-    #     if not seg:
-    #         image = functional.interpolate(image, target_shape, mode='trilinear')
-    #     else:
-    #         if not smooth_seg:
-    #             image = functional.interpolate(image, target_shape, mode='nearest')
-    #         else:
-    #             image = resample_seg_smooth(image, target_shape, processes, desc, disable)
-
-    # Determine whether to use GPU
-    if gpu and torch.cuda.is_available():
-        device = torch.device("cuda")
-        image = image.to(device)
-
-        # If multiple GPUs, use DataParallel
-        if torch.cuda.device_count() > 1:
-            resample_fn = torch.nn.DataParallel(InterpolateModule(), device_ids=[0, 1])
+    with torch.no_grad():
+        if gpu:
+            image = image.cuda()
+        if not seg:
+            image = functional.interpolate(image, target_shape, mode='trilinear')
         else:
-            resample_fn = functional.interpolate
-
-        with torch.no_grad():
-            if not seg:
-                image = resample_fn(input=image, size=target_shape, mode='trilinear', align_corners=False)
+            if not smooth_seg:
+                image = functional.interpolate(image, target_shape, mode='nearest')
             else:
-                if not smooth_seg:
-                    image = resample_fn(input=image, size=target_shape, mode='nearest')
-                else:
-                    image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+                image = resample_seg_smooth(image, target_shape, processes, desc, disable)
 
-    else:  # If GPU is disabled or unavailable, run on CPU
-        with torch.no_grad():
-            if not seg:
-                image = functional.interpolate(image, size=target_shape, mode='trilinear', align_corners=False)
-            else:
-                if not smooth_seg:
-                    image = functional.interpolate(image, size=target_shape, mode='nearest')
-                else:
-                    image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+    # # Determine whether to use GPU
+    # if gpu and torch.cuda.is_available():
+    #     device = torch.device("cuda")
+    #     image = image.to(device)
+
+    #     # If multiple GPUs, use DataParallel
+    #     if torch.cuda.device_count() > 1:
+    #         resample_fn = torch.nn.DataParallel(InterpolateModule(), device_ids=[0, 1])
+    #     else:
+    #         resample_fn = functional.interpolate
+
+    #     with torch.no_grad():
+    #         if not seg:
+    #             image = resample_fn(input=image, size=target_shape, mode='trilinear', align_corners=False)
+    #         else:
+    #             if not smooth_seg:
+    #                 image = resample_fn(input=image, size=target_shape, mode='nearest')
+    #             else:
+    #                 image = resample_seg_smooth(image, target_shape, processes, desc, disable, gpu)
+
+    # else:  # If GPU is disabled or unavailable, run on CPU
+    #     with torch.no_grad():
+    #         if not seg:
+    #             image = functional.interpolate(image, size=target_shape, mode='trilinear', align_corners=False)
+    #         else:
+    #             if not smooth_seg:
+    #                 image = functional.interpolate(image, size=target_shape, mode='nearest')
+    #             else:
+    #                 image = resample_seg_smooth(image, target_shape, processes, desc, disable, gpu)
 
     image = image.cpu().numpy()[0][0]
     torch.cuda.empty_cache()
@@ -124,6 +154,27 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
             reshaped[reshaped_multihot_tensors[i] >= 0.5] = label
 
     return reshaped
+
+
+# def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: int, desc: str,
+#                         disable: bool, gpu: bool = True) -> torch.Tensor:
+#     # If GPUs are enabled and multiple GPUs are available, use DataParallel with GPUs 0 and 1
+#     if gpu and torch.cuda.is_available():
+#         if torch.cuda.device_count() > 1:
+#             module = ResampleSegSmoothModule(target_shape, processes, desc, disable)
+#             module = torch.nn.DataParallel(module, device_ids=[0, 1])  # Use GPUs 0 and 1
+#         else:
+#             # Single GPU, no need for DataParallel
+#             module = ResampleSegSmoothModule(target_shape, processes, desc, disable)
+#     else:
+#         # Fallback to CPU or when GPU is disabled
+#         module = ResampleSegSmoothModule(target_shape, processes, desc, disable)
+    
+#     # Move the tensor to the appropriate device (GPU or CPU)
+#     device = torch.device("cuda" if gpu and torch.cuda.is_available() else "cpu")
+#     seg = seg.to(device)
+    
+#     return module(seg)
 
 
 def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: Tuple[int, int, int]) -> torch.Tensor:
