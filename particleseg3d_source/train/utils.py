@@ -613,7 +613,7 @@ def save_nifti(filename: str,
         [image.SetMetaData(key, header[key]) for key in header.keys()]
 
     if spacing is not None:
-        image.SetSpacing(spacing*3)
+        image.SetSpacing(spacing)
 
     if affine is not None:
         pass  # How do I set the affine transform with SimpleITK? With NiBabel it is just nib.Nifti1Image(img, affine=affine, header=header)
