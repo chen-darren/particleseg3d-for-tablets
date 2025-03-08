@@ -17,7 +17,10 @@ from os.path import join
 from natsort import natsorted
 
 
-def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1'):
+import torch
+import torch.nn.functional as F
+
+def interpolate_on_multiple_gpus_with_overlap(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1', overlap=10):
     # Ensure the image is on device_0
     image = image.to(device_0)
     
@@ -25,23 +28,34 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     depth = image.shape[2]
     mid_point = depth // 2
     
-    # Split the image into two parts along the depth axis
-    image_part1 = image[:, :, :mid_point, :, :].to(device_0)  # First part on GPU 0
-    image_part2 = image[:, :, mid_point:, :, :].to(device_1)  # Second part on GPU 1
-    target_size_part1 = [int(mid_point/depth*target_shape[0]), target_shape[1], target_shape[2]]  # Adjusted target size for part 1
-    target_size_part2 = [target_shape[0] - int(mid_point/depth*target_shape[0]), target_shape[1], target_shape[2]]  # Adjusted target size for part 2
+    # Define overlap region
+    overlap_start = mid_point - overlap
+    overlap_end = mid_point + overlap
     
-    # Perform interpolation on both parts
-    image_part1_resampled = functional.interpolate(image_part1, size=target_size_part1, mode=mode)
-    image_part2_resampled = functional.interpolate(image_part2, size=target_size_part2, mode=mode)
+    # Split the image into two parts with overlap
+    image_part1 = image[:, :, :mid_point + overlap, :, :].to(device_0)  # First part on GPU 0 (with overlap)
+    image_part2 = image[:, :, mid_point - overlap:, :, :].to(device_1)  # Second part on GPU 1 (with overlap)
     
-    # Move the results back to GPU 0 or CPU (if needed)
+    # Adjusted target size for part 1 and part 2
+    target_size_part1 = [int((mid_point + overlap) / depth * target_shape[0]), target_shape[1], target_shape[2]]
+    target_size_part2 = [target_shape[0] - int((mid_point - overlap) / depth * target_shape[0]), target_shape[1], target_shape[2]]
+    
+    # Perform trilinear interpolation on both parts
+    image_part1_resampled = F.interpolate(image_part1, size=target_size_part1, mode=mode, align_corners=True)
+    image_part2_resampled = F.interpolate(image_part2, size=target_size_part2, mode=mode, align_corners=True)
+    
+    # Remove the overlap regions after interpolation
+    image_part1_resampled = image_part1_resampled[:, :, :-overlap, :, :]
+    image_part2_resampled = image_part2_resampled[:, :, overlap:, :, :]
+    
+    # Move the results back to CPU (if needed)
     image_part1_resampled = image_part1_resampled.to('cpu')
     image_part2_resampled = image_part2_resampled.to('cpu')
     
     # Combine the two parts back along the depth axis
     result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
     
+    # Clear CUDA cache
     with torch.cuda.device(device_0):
         torch.cuda.empty_cache()
     with torch.cuda.device(device_1):
@@ -83,6 +97,8 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
             try:
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
+                with torch.cuda.device('cuda:' + str(device)):
+                    torch.cuda.empty_cache()
                 image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
         else:
             if not smooth_seg:
@@ -123,6 +139,8 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
             try:
                 reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
             except RuntimeError as e:
+                with torch.cuda.device(seg.device):
+                    torch.cuda.empty_cache()
                 reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
             # reshaped[reshaped_multihot >= 0.5] = label # Where CUDA out of memory error occurs
             reshaped = torch.where(reshaped_multihot >= 0.5, label, reshaped) # Potential method to reduce memory usage
@@ -152,7 +170,7 @@ def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: T
         reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
     except RuntimeError as e:
         reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
-        
+
     return reshaped_multihot
 
 
