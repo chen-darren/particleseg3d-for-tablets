@@ -103,8 +103,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
             try:
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
-                with torch.cuda.device('cuda:' + str(device)):
-                    torch.cuda.empty_cache()
+                empty_cache_for_all_gpus(gpu)
                 image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
         else:
             if not smooth_seg:
