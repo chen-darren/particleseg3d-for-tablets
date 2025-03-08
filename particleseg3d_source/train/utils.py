@@ -58,7 +58,7 @@ from natsort import natsorted
 #         return reshaped
 
 def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu: bool = True,
-             smooth_seg: bool = True, processes: int = None, desc: str = None, disable: bool = True) -> np.ndarray:
+             smooth_seg: bool = True, processes: int = None, desc: str = None, disable: bool = True, device: int = 0) -> np.ndarray:
     """
     Resample an image to a target shape.
 
@@ -71,17 +71,21 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
         processes (int, optional): The number of processes to use. Defaults to None.
         desc (str, optional): A description of the progress bar. Defaults to None.
         disable (bool, optional): Whether to disable the progress bar. Defaults to True.
+        device (int, optional): Which GPU to use (choose 0 or 1 only)
 
     Returns:
         np.ndarray: The resampled image.
     """
+    if device != 0 and device != 1:
+        raise ValueError('Invalid GPU ID of ' + str(device))
+
     if all([i == j for i, j in zip(image.shape[1:], target_shape)]):
         return image
 
     image = torch.from_numpy(image[np.newaxis, np.newaxis, ...].astype(np.float32))
     with torch.no_grad():
         if gpu:
-            image = image.cuda(device=1)
+            image = image.cuda(device=device)
         if not seg:
             image = functional.interpolate(image, target_shape, mode='trilinear')
         else:
