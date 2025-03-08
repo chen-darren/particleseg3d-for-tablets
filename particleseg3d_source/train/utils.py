@@ -42,14 +42,18 @@ from natsort import natsorted
 #             for i, label in enumerate(tqdm(unique_labels, desc=self.desc, disable=self.disable)):
 #                 mask = seg == label
 #                 reshaped_multihot = functional.interpolate(mask.float(), self.target_shape, mode='trilinear')
-#                 reshaped[reshaped_multihot >= 0.5] = label
+#                 # reshaped[reshaped_multihot >= 0.5] = label # Where CUDA out of memory error occurs
+#                 reshaped = torch.where(reshaped_multihot >= 0.5, label, reshaped) # Potential method to reduce memory usage
+#                 # reshaped.masked_fill_(reshaped_multihot >= 0.5, label) # Second potential method to reduce memory usage
 #         else:
 #             reshaped_multihot_tensors = ptqdm(_resample_seg_smooth, unique_labels, self.processes, 
 #                                               desc=self.desc, disable=self.disable, seg=seg, 
 #                                               target_shape=self.target_shape)
 
 #             for i, label in enumerate(unique_labels):
-#                 reshaped[reshaped_multihot_tensors[i] >= 0.5] = label
+#                 # reshaped[reshaped_multihot_tensors[i] >= 0.5] = label # An out of memory error for CUDA probably also happens here
+#                 reshaped = torch.where(reshaped_multihot_tensors[i] >= 0.5, label, reshaped) # Same first workaround as for when proccesses is None
+#                 # reshaped.masked_fill_(reshaped_multihot_tensors[i] >= 0.5, label) # Same second workaround as for when processes is None
 
 #         return reshaped
 
@@ -77,7 +81,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
     image = torch.from_numpy(image[np.newaxis, np.newaxis, ...].astype(np.float32))
     with torch.no_grad():
         if gpu:
-            image = image.cuda()
+            image = image.cuda(device=1)
         if not seg:
             image = functional.interpolate(image, target_shape, mode='trilinear')
         else:
@@ -153,8 +157,8 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
         reshaped_multihot_tensors = ptqdm(_resample_seg_smooth, unique_labels, processes, desc=desc, disable=disable, seg=seg, target_shape=target_shape)
 
         for i, label in enumerate(unique_labels):
-            reshaped[reshaped_multihot_tensors[i] >= 0.5] = label # An out of memory error for CUDA probably also happens here
-            # reshaped = torch.where(reshaped_multihot_tensors[i] >= 0.5, label, reshaped) # Same first workaround as for when proccesses is None
+            # reshaped[reshaped_multihot_tensors[i] >= 0.5] = label # An out of memory error for CUDA probably also happens here
+            reshaped = torch.where(reshaped_multihot_tensors[i] >= 0.5, label, reshaped) # Same first workaround as for when proccesses is None
             # reshaped.masked_fill_(reshaped_multihot_tensors[i] >= 0.5, label) # Same second workaround as for when processes is None
 
     return reshaped
