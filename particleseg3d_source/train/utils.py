@@ -20,7 +20,7 @@ from natsort import natsorted
 import torch
 import torch.nn.functional as F
 
-def interpolate_on_multiple_gpus_with_overlap(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1', overlap=10):
+def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1', overlap=10):
     # Ensure the image is on device_0
     image = image.to(device_0)
     
