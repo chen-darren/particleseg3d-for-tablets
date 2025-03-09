@@ -63,7 +63,7 @@ def empty_cache_for_all_gpus(gpu=True):
     else:
         print("CUDA is not available or GPU is set to False. Skipping empty cache.")
 
-def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1', overlap=10):
+def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1'):
     # print('1=================')
     # check_gpu_memory()
     # print('==================')
@@ -79,6 +79,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     mid_point = depth // 2
     
     # Define overlap region (ensure no negative indices)
+    overlap = max(50, int((mid_point + 1) * 0.2)) # Overlap with is 20% of chunk depth with a minimum of 50 voxels
     overlap_start = max(mid_point - overlap, 0)
     overlap_end = min(mid_point + overlap, depth)
 
