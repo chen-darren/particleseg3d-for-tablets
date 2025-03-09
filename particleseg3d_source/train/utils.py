@@ -134,7 +134,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     # print('==================')
     
     # Remove the overlap regions after interpolation
-    target_depth_part1_no_overlap = int(mid_point * (target_shape[0] / depth))
+    target_depth_part1_no_overlap = int((mid_point / depth) * target_shape[0])
     target_depth_part2_no_overlap = target_shape[0] - target_depth_part1_no_overlap
     image_part1_resampled_no_overlap = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
     image_part2_resampled_no_overlap = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
