@@ -80,6 +80,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     
     # Define overlap region (ensure no negative indices)
     overlap = max(50, int((mid_point + 1) * 0.2)) # Overlap with is 20% of chunk depth with a minimum of 50 voxels
+    print('Overlap:', overlap, 'voxels')
     overlap_start = max(mid_point - overlap, 0)
     overlap_end = min(mid_point + overlap, depth)
 
@@ -144,7 +145,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
 
     # Check shapes
-    print("Target shape:", target_shape)
+    print("\nTarget shape:", target_shape)
     print("Image part 1 resampled shape:", image_part1_resampled.shape)
     print("Image part 2 resampled shape:", image_part2_resampled.shape)
     print("Result image shape:", result_image.shape)
