@@ -17,9 +17,6 @@ from os.path import join
 from natsort import natsorted
 
 
-import torch
-import torch.nn.functional as F
-
 def empty_cache_for_all_gpus(gpu=True):
     if torch.cuda.is_available() and gpu:  # Check if CUDA is available
         num_gpus = torch.cuda.device_count()  # Get the number of GPUs available
@@ -33,29 +30,31 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     # Clear CUDA cache
     empty_cache_for_all_gpus()
 
-    # Split the image along the depth axis (axis 2)
+    # Get the image depth
     depth = image.shape[2]
     mid_point = depth // 2
     
-    # Define overlap region
-    overlap_start = mid_point - overlap
-    overlap_end = mid_point + overlap
-    
+    # Define overlap region (ensure no negative indices)
+    overlap_start = max(mid_point - overlap, 0)
+    overlap_end = min(mid_point + overlap, depth)
+
     # Split the image into two parts with overlap
-    image_part1 = image[:, :, :mid_point + overlap, :, :].to(device_0)  # First part on GPU 0 (with overlap)
-    image_part2 = image[:, :, mid_point - overlap:, :, :].to(device_1)  # Second part on GPU 1 (with overlap)
+    image_part1 = image[:, :, :overlap_end, :, :].to(device_0)  # First part on GPU 0 (with overlap)
+    image_part2 = image[:, :, overlap_start:, :, :].to(device_1)  # Second part on GPU 1 (with overlap)
     
-    # Adjusted target size for part 1 and part 2
-    target_size_part1 = [int((mid_point + overlap) / depth * target_shape[0]), target_shape[1], target_shape[2]]
-    target_size_part2 = [target_shape[0] - int((mid_point - overlap) / depth * target_shape[0]), target_shape[1], target_shape[2]]
+    # Calculate the target size for each part based on total target shape
+    target_size_part1 = [int((overlap_end / depth) * target_shape[0]), target_shape[1], target_shape[2]]
+    target_size_part2 = [int((1 - overlap_start / depth) * target_shape[0]), target_shape[1], target_shape[2]]
     
     # Perform trilinear interpolation on both parts
-    image_part1_resampled = F.interpolate(image_part1, size=target_size_part1, mode=mode, align_corners=True)
-    image_part2_resampled = F.interpolate(image_part2, size=target_size_part2, mode=mode, align_corners=True)
+    image_part1_resampled = functional.interpolate(image_part1, size=target_size_part1, mode=mode, align_corners=True)
+    image_part2_resampled = functional.interpolate(image_part2, size=target_size_part2, mode=mode, align_corners=True)
     
     # Remove the overlap regions after interpolation
-    image_part1_resampled = image_part1_resampled[:, :, :-overlap, :, :]
-    image_part2_resampled = image_part2_resampled[:, :, overlap:, :, :]
+    target_depth_part1_no_overlap = int(mid_point * (target_shape[0] / depth))
+    target_depth_part2_no_overlap = target_shape[0] - target_depth_part1_no_overlap
+    image_part1_resampled = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
+    image_part2_resampled = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
     
     # Move the results back to CPU (if needed)
     image_part1_resampled = image_part1_resampled.to('cpu')
@@ -103,6 +102,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
             try:
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
+                print('Error')
                 empty_cache_for_all_gpus(gpu)
                 image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
         else:
@@ -110,7 +110,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
                 image = functional.interpolate(image, target_shape, mode='nearest')
             else:
                 image = resample_seg_smooth(image, target_shape, processes, desc, disable)
-
+                
     image = image.cpu().numpy()[0][0]
     empty_cache_for_all_gpus(gpu)
 
@@ -145,6 +145,7 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
                 empty_cache_for_all_gpus()
                 reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
             except RuntimeError as e:
+                print('Error')
                 reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
             # reshaped[reshaped_multihot >= 0.5] = label # Where CUDA out of memory error occurs
             reshaped = torch.where(reshaped_multihot >= 0.5, label, reshaped) # Potential method to reduce memory usage
