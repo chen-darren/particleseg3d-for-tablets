@@ -201,7 +201,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], size_conversion_factor
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
                 # print(f"\nRuntimeError occurred: {e}")
-                print("\nRetrying interpolation on multiple GPUs...")
+                print("\nError! Retrying interpolation on multiple GPUs...")
                 empty_cache_for_all_gpus(gpu)
                 image = interpolate_on_multiple_gpus(image, target_shape, size_conversion_factor, mode='trilinear')
         else:
@@ -262,8 +262,8 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], size_conver
                 # check_gpu_memory()
                 # print('===============================')
 
-                print(f"\nRuntimeError occurred: {e}")
-                print("Retrying interpolation on multiple GPUs...")
+                # print(f"\nRuntimeError occurred: {e}")
+                print("\nError! Retrying interpolation on multiple GPUs...")
                 reshaped_multihot = interpolate_on_multiple_gpus(mask, target_shape, size_conversion_factor, mode='trilinear').cpu() # Move to CPU to save VRAM
             # reshaped[reshaped_multihot >= 0.5] = label.cpu() # Where CUDA out of memory error occurs
             reshaped = torch.where(reshaped_multihot >= 0.5, label.cpu(), reshaped) # Potential method to reduce memory usage
@@ -295,8 +295,8 @@ def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: T
         empty_cache_for_all_gpus()
         reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
     except RuntimeError as e:
-        print(f"\nRuntimeError occurred: {e}")
-        print("Retrying interpolation on multiple GPUs...")
+        # print(f"\nRuntimeError occurred: {e}")
+        print("\nError! Retrying interpolation on multiple GPUs...")
         reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, size_conversion_factor, mode='trilinear')
 
     return reshaped_multihot
