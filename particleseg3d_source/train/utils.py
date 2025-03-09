@@ -79,7 +79,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     mid_point = depth // 2
     
     # Define overlap region (ensure no negative indices)
-    overlap = max(50, int((mid_point + 1) * 0.2)) # Overlap with is 20% of chunk depth with a minimum of 50 voxels
+    overlap = max(min(50, mid_point), int((mid_point + 1) * 0.2)) # Overlap with is 20% of chunk depth with a minimum of 50 voxels/mid point
     print('Overlap:', overlap, 'voxels')
     overlap_start = max(mid_point - overlap, 0)
     overlap_end = min(mid_point + overlap, depth)
