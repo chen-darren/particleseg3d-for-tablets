@@ -79,7 +79,7 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     mid_point = depth // 2
     
     # Define overlap region (ensure no negative indices)
-    overlap = max(min(50, mid_point), int((mid_point + 1) * 0.2)) # Overlap with is 20% of chunk depth with a minimum of 50 voxels/mid point
+    overlap = max(min(50, mid_point), int(depth * 0.125)) # Overlap with is 25% of chunk depth (12.5% of depth) with a minimum of 50 voxels/mid point
     print('Overlap:', overlap, 'voxels')
     overlap_start = max(mid_point - overlap, 0)
     overlap_end = min(mid_point + overlap, depth)
@@ -89,8 +89,10 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     image_part2 = image[:, :, overlap_start:, :, :].to(device_1)  # Second part on GPU 1 (with overlap)
     
     # Calculate the target size for each part based on total target shape
-    target_size_part1 = [int((overlap_end / depth) * target_shape[0]), target_shape[1], target_shape[2]]
-    target_size_part2 = [int((1 - overlap_start / depth) * target_shape[0]), target_shape[1], target_shape[2]]
+    target_depth_part1 = int((overlap_end / depth) * target_shape[0])
+    target_depth_part2 = target_shape[0] - target_depth_part1
+    target_size_part1 = [target_depth_part1, target_shape[1], target_shape[2]]
+    target_size_part2 = [target_depth_part2, target_shape[1], target_shape[2]]
 
     # Clear CUDA cache
     empty_cache_for_all_gpus()
@@ -134,20 +136,25 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     # Remove the overlap regions after interpolation
     target_depth_part1_no_overlap = int(mid_point * (target_shape[0] / depth))
     target_depth_part2_no_overlap = target_shape[0] - target_depth_part1_no_overlap
-    image_part1_resampled = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
-    image_part2_resampled = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
+    image_part1_resampled_no_overlap = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
+    image_part2_resampled_no_overlap = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
     
     # Move the results to CPU to save VRAM
-    image_part1_resampled = image_part1_resampled.to('cpu')
-    image_part2_resampled = image_part2_resampled.to('cpu')
+    image_part1_resampled_no_overlap = image_part1_resampled_no_overlap.to('cpu')
+    image_part2_resampled_no_overlap = image_part2_resampled_no_overlap.to('cpu')
     
     # Combine the two parts back along the depth axis
     result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
 
     # Check shapes
-    print("\nTarget shape:", target_shape)
+    print("\nInitial shape:", image[0][0].shape)
+    print("Image part 1 shape:", image_part1.shape)
+    print("Image part 2 shape:", image_part2.shape)
+    print("Target shape:", target_shape)
     print("Image part 1 resampled shape:", image_part1_resampled.shape)
     print("Image part 2 resampled shape:", image_part2_resampled.shape)
+    print("Image part 1 resampled (no overlap) shape:", image_part1_resampled.shape)
+    print("Image part 2 resampled (no overlap) shape:", image_part2_resampled.shape)
     print("Result image shape:", result_image.shape)
     
     # Clear CUDA cache
@@ -189,8 +196,8 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
             try:
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
-                print(f"\nRuntimeError occurred: {e}")
-                print("Retrying interpolation on multiple GPUs...")
+                # print(f"\nRuntimeError occurred: {e}")
+                print("\nRetrying interpolation on multiple GPUs...")
                 empty_cache_for_all_gpus(gpu)
                 image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
         else:
