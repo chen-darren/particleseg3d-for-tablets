@@ -63,7 +63,7 @@ def empty_cache_for_all_gpus(gpu=True):
     else:
         print("CUDA is not available or GPU is set to False. Skipping empty cache.")
 
-def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1'):
+def interpolate_on_multiple_gpus(image, target_shape, size_conversion_factor, mode, device_0='cuda:0', device_1='cuda:1'):
     # print('1=================')
     # check_gpu_memory()
     # print('==================')
@@ -89,8 +89,8 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     image_part2 = image[:, :, overlap_start:, :, :].to(device_1)  # Second part on GPU 1 (with overlap)
     
     # Calculate the target size for each part based on total target shape
-    target_depth_part1 = int((overlap_end / depth) * target_shape[0])
-    target_depth_part2 = target_shape[0] - target_depth_part1
+    target_depth_part1 = int(np.rint(overlap_end * size_conversion_factor))
+    target_depth_part2 = int(np.rint((depth - overlap_start) * size_conversion_factor))
     target_size_part1 = [target_depth_part1, target_shape[1], target_shape[2]]
     target_size_part2 = [target_depth_part2, target_shape[1], target_shape[2]]
 
@@ -134,25 +134,25 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     # print('==================')
     
     # Remove the overlap regions after interpolation
-    target_depth_part1_no_overlap = int((mid_point / depth) * target_shape[0])
+    target_depth_part1_no_overlap = int(np.rint(mid_point * size_conversion_factor))
     target_depth_part2_no_overlap = target_shape[0] - target_depth_part1_no_overlap
-    image_part1_resampled_no_overlap = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
-    image_part2_resampled_no_overlap = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
-    
+    image_part1_resampled = image_part1_resampled[:, :, :target_depth_part1_no_overlap, :, :]
+    image_part2_resampled = image_part2_resampled[:, :, -target_depth_part2_no_overlap:, :, :]
+
     # Move the results to CPU to save VRAM
-    image_part1_resampled_no_overlap = image_part1_resampled_no_overlap.to('cpu')
-    image_part2_resampled_no_overlap = image_part2_resampled_no_overlap.to('cpu')
-    
+    image_part1_resampled = image_part1_resampled.to('cpu')
+    image_part2_resampled = image_part2_resampled.to('cpu')
+
     # Combine the two parts back along the depth axis
-    result_image = torch.cat([image_part1_resampled_no_overlap, image_part2_resampled_no_overlap], dim=2)
+    result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
 
     # Check shapes
     print("\nInitial shape:", image.shape[-3:])
     print("Image part 1 shape:", image_part1.shape)
     print("Image part 2 shape:", image_part2.shape)
     print("Target shape:", target_shape)
-    print("Image part 1 resampled shape:", image_part1_resampled.shape)
-    print("Image part 2 resampled shape:", image_part2_resampled.shape)
+    print("Image part 1 resampled shape:", target_size_part1)
+    print("Image part 2 resampled shape:", target_size_part2)
     print("Image part 1 resampled (no overlap) shape:", image_part1_resampled.shape)
     print("Image part 2 resampled (no overlap) shape:", image_part2_resampled.shape)
     print("Result image shape:", result_image.shape)
@@ -160,13 +160,13 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     # Clear CUDA cache
     empty_cache_for_all_gpus()
 
-    if target_shape != result_image.shape[-3:]:  # Ensure last three dims match for a 3D image
+    if tuple(target_shape) != tuple(result_image.shape[-3:]):  
         raise ValueError('Target shape and result_image shape do not match')
 
     return result_image.to(image.device)
 
 
-def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu: bool = True,
+def resample(image: np.ndarray, target_shape: Tuple[int], size_conversion_factor: float, seg: bool = False, gpu: bool = True,
              smooth_seg: bool = True, processes: int = None, desc: str = None, disable: bool = True, device: int = 0) -> np.ndarray:
     """
     Resample an image to a target shape.
@@ -174,6 +174,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
     Args:
         image (np.ndarray): The image to resample.
         target_shape (Tuple[int]): The shape to resample to.
+        size_conversion_factor (float): How much to resample by.
         seg (bool, optional): Whether the image is a segmentation. Defaults to False.
         gpu (bool, optional): Whether to use the GPU. Defaults to True.
         smooth_seg (bool, optional): Whether to smooth the segmentation. Defaults to True.
@@ -202,12 +203,12 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
                 # print(f"\nRuntimeError occurred: {e}")
                 print("\nRetrying interpolation on multiple GPUs...")
                 empty_cache_for_all_gpus(gpu)
-                image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
+                image = interpolate_on_multiple_gpus(image, target_shape, size_conversion_factor, mode='trilinear')
         else:
             if not smooth_seg:
                 image = functional.interpolate(image, target_shape, mode='nearest')
             else:
-                image = resample_seg_smooth(image, target_shape, processes, desc, disable)
+                image = resample_seg_smooth(image, target_shape, size_conversion_factor, processes, desc, disable)
 
     image = image.cpu().numpy()[0][0]
     empty_cache_for_all_gpus(gpu)
@@ -215,7 +216,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
     return image
 
 
-def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: int, desc: str,
+def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], size_conversion_factor: float, processes: int, desc: str,
                         disable: bool) -> torch.Tensor:
     """
     Smoothly resample a segmentation.
@@ -223,6 +224,7 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
     Args:
         seg (torch.Tensor): The segmentation to resample.
         target_shape (Tuple[int]): The shape to resample to.
+        size_conversion_factor (float): The factor to resample by.
         processes (int): The number of processes to use.
         desc (str): A description of the progress bar.
         disable (bool): Whether to disable the progress bar.
@@ -262,12 +264,12 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
 
                 print(f"\nRuntimeError occurred: {e}")
                 print("Retrying interpolation on multiple GPUs...")
-                reshaped_multihot = interpolate_on_multiple_gpus(mask, target_shape, mode='trilinear').cpu() # Move to CPU to save VRAM
+                reshaped_multihot = interpolate_on_multiple_gpus(mask, target_shape, size_conversion_factor, mode='trilinear').cpu() # Move to CPU to save VRAM
             # reshaped[reshaped_multihot >= 0.5] = label.cpu() # Where CUDA out of memory error occurs
             reshaped = torch.where(reshaped_multihot >= 0.5, label.cpu(), reshaped) # Potential method to reduce memory usage
             # reshaped.masked_fill_(reshaped_multihot >= 0.5, label.cpu()) # Second potential method to reduce memory usage
     else:
-        reshaped_multihot_tensors = ptqdm(_resample_seg_smooth, unique_labels, processes, desc=desc, disable=disable, seg=seg, target_shape=target_shape).cpu() # Move to CPU to save VRAM
+        reshaped_multihot_tensors = ptqdm(_resample_seg_smooth, unique_labels, processes, desc=desc, disable=disable, seg=seg, target_shape=target_shape, size_conversion_factor=size_conversion_factor).cpu() # Move to CPU to save VRAM
 
         for i, label in enumerate(unique_labels):
             # reshaped[reshaped_multihot_tensors[i] >= 0.5] = label.cpu() # An out of memory error for CUDA probably also happens here
@@ -278,13 +280,14 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
     return reshaped.to(seg.device)
 
 
-def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: Tuple[int, int, int]) -> torch.Tensor:
+def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: Tuple[int, int, int], size_conversion_factor: float) -> torch.Tensor:
     """
     Resamples the given label tensor to the target shape.
 
     :param label: A tensor containing the label.
     :param seg: The segmentation tensor containing the label.
     :param target_shape: A tuple containing the target shape of the label tensor.
+    :param size_conversion_factor: Float of the factor to resample by.
     :return: A tensor with the resampled label.
     """
     mask = seg == label
@@ -294,7 +297,7 @@ def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: T
     except RuntimeError as e:
         print(f"\nRuntimeError occurred: {e}")
         print("Retrying interpolation on multiple GPUs...")
-        reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
+        reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, size_conversion_factor, mode='trilinear')
 
     return reshaped_multihot
 
