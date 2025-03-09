@@ -17,6 +17,43 @@ from os.path import join
 from natsort import natsorted
 
 
+def check_gpu_memory(device=None):
+    # Get the number of GPUs
+    num_gpus = torch.cuda.device_count()
+
+    if num_gpus == 0:
+        print("No GPUs detected.")
+        return
+
+    # If a specific device is given, validate it
+    if device is not None:
+        device_id = int(device.split(':')[1]) if ':' in device else int(device)
+        if device_id >= num_gpus:
+            print(f"Error: Device {device} is not available. Only {num_gpus} GPUs are detected.")
+            return
+        # Check memory for the specified device
+        check_memory_for_device(device_id)
+    else:
+        # Check memory for all GPUs
+        for i in range(num_gpus):
+            check_memory_for_device(i)
+
+
+def check_memory_for_device(device_id):
+    # Get memory info for the specific device
+    total_memory = torch.cuda.get_device_properties(device_id).total_memory
+    memory_allocated = torch.cuda.memory_allocated(device_id)
+    memory_cached = torch.cuda.memory_reserved(device_id)
+
+    available_memory = total_memory - memory_allocated
+
+    print(f"GPU {device_id}:")
+    print(f"  Total Memory: {total_memory / 1e9:.2f} GB")
+    print(f"  Memory Allocated: {memory_allocated / 1e9:.2f} GB")
+    print(f"  Memory Cached: {memory_cached / 1e9:.2f} GB")
+    print(f"  Available Memory: {available_memory / 1e9:.2f} GB\n")
+
+
 def empty_cache_for_all_gpus(gpu=True):
     if torch.cuda.is_available() and gpu:  # Check if CUDA is available
         num_gpus = torch.cuda.device_count()  # Get the number of GPUs available
@@ -27,6 +64,9 @@ def empty_cache_for_all_gpus(gpu=True):
         print("CUDA is not available or GPU is set to False. Skipping empty cache.")
 
 def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', device_1='cuda:1', overlap=10):
+    if torch.cuda.is_available() and torch.cuda.device_count() < 2:
+        raise ValueError("Not enough GPUs for 'interpolate_on_multiple_gpus'")
+    
     # Clear CUDA cache
     empty_cache_for_all_gpus()
 
@@ -46,9 +86,22 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     target_size_part1 = [int((overlap_end / depth) * target_shape[0]), target_shape[1], target_shape[2]]
     target_size_part2 = [int((1 - overlap_start / depth) * target_shape[0]), target_shape[1], target_shape[2]]
     
-    # Perform trilinear interpolation on both parts
-    image_part1_resampled = functional.interpolate(image_part1, size=target_size_part1, mode=mode, align_corners=True)
-    image_part2_resampled = functional.interpolate(image_part2, size=target_size_part2, mode=mode, align_corners=True)
+    # Create streams for each GPU
+    stream1 = torch.cuda.Stream(device=device_0)
+    stream2 = torch.cuda.Stream(device=device_1)
+
+    # Perform trilinear interpolation on both parts asynchronously using streams
+    with torch.cuda.stream(stream1):
+        check_gpu_memory(device_0)
+        image_part1_resampled = functional.interpolate(image_part1, size=target_size_part1, mode=mode)
+
+    with torch.cuda.stream(stream2):
+        check_gpu_memory(device_1)
+        image_part2_resampled = functional.interpolate(image_part2, size=target_size_part2, mode=mode)
+
+    # Wait for both streams to finish
+    stream1.synchronize()
+    stream2.synchronize()
     
     # Remove the overlap regions after interpolation
     target_depth_part1_no_overlap = int(mid_point * (target_shape[0] / depth))
@@ -62,6 +115,12 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     
     # Combine the two parts back along the depth axis
     result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
+
+    # Check shapes
+    print("Target shape:", target_shape)
+    print("Image part 1 resampled shape:", image_part1_resampled.shape)
+    print("Image part 2 resampled shape:", image_part2_resampled.shape)
+    print("Result image shape:", result_image.shape)
     
     # Clear CUDA cache
     empty_cache_for_all_gpus()
@@ -102,7 +161,8 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
             try:
                 image = functional.interpolate(image, target_shape, mode='trilinear')
             except RuntimeError as e:
-                print('Error')
+                print(f"\nRuntimeError occurred: {e}")
+                print("Retrying interpolation on multiple GPUs...")
                 empty_cache_for_all_gpus(gpu)
                 image = interpolate_on_multiple_gpus(image, target_shape, mode='trilinear')
         else:
@@ -110,7 +170,7 @@ def resample(image: np.ndarray, target_shape: Tuple[int], seg: bool = False, gpu
                 image = functional.interpolate(image, target_shape, mode='nearest')
             else:
                 image = resample_seg_smooth(image, target_shape, processes, desc, disable)
-                
+
     image = image.cpu().numpy()[0][0]
     empty_cache_for_all_gpus(gpu)
 
@@ -145,7 +205,8 @@ def resample_seg_smooth(seg: torch.Tensor, target_shape: Tuple[int], processes: 
                 empty_cache_for_all_gpus()
                 reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
             except RuntimeError as e:
-                print('Error')
+                print(f"\nRuntimeError occurred: {e}")
+                print("Retrying interpolation on multiple GPUs...")
                 reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
             # reshaped[reshaped_multihot >= 0.5] = label # Where CUDA out of memory error occurs
             reshaped = torch.where(reshaped_multihot >= 0.5, label, reshaped) # Potential method to reduce memory usage
@@ -176,6 +237,8 @@ def _resample_seg_smooth(label: torch.Tensor, seg: torch.Tensor, target_shape: T
         empty_cache_for_all_gpus()
         reshaped_multihot = functional.interpolate(mask.float(), target_shape, mode='trilinear')
     except RuntimeError as e:
+        print(f"\nRuntimeError occurred: {e}")
+        print("Retrying interpolation on multiple GPUs...")
         reshaped_multihot = interpolate_on_multiple_gpus(mask.float(), target_shape, mode='trilinear')
 
     return reshaped_multihot
