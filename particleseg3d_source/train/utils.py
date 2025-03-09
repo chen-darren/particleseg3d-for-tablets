@@ -144,10 +144,10 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     image_part2_resampled_no_overlap = image_part2_resampled_no_overlap.to('cpu')
     
     # Combine the two parts back along the depth axis
-    result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
+    result_image = torch.cat([image_part1_resampled_no_overlap, image_part2_resampled_no_overlap], dim=2)
 
     # Check shapes
-    print("\nInitial shape:", image[0][0].shape)
+    print("\nInitial shape:", image.shape[-3:])
     print("Image part 1 shape:", image_part1.shape)
     print("Image part 2 shape:", image_part2.shape)
     print("Target shape:", target_shape)
@@ -159,6 +159,9 @@ def interpolate_on_multiple_gpus(image, target_shape, mode, device_0='cuda:0', d
     
     # Clear CUDA cache
     empty_cache_for_all_gpus()
+
+    if target_shape != result_image.shape[-3:]:  # Ensure last three dims match for a 3D image
+        raise ValueError('Target shape and result_image shape do not match')
 
     return result_image.to(image.device)
 
