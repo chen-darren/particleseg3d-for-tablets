@@ -57,3 +57,23 @@ pip install "napari[all]"
 conda install conda-forge::matplotlib
 pip3 install opencv-python
 pip install imagecodecs
+
+
+FOR LINUX:
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
+conda install -n Senior_Design_py310_source conda-forge::mamba
+mamba install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+mamba install conda-forge::p-tqdm
+mamba install conda-forge::pretty_errors
+sudo apt update
+sudo apt install cmake build-essential python3-dev
+conda install -c conda-forge cmake ninja
+pip install --upgrade pip setuptools wheel
+pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
+mamba install ipykernel
+pip install "napari[all]"
+conda install conda-forge::matplotlib
+pip3 install opencv-python
+pip install imagecodecs
