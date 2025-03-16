@@ -19,7 +19,7 @@ General Process
 9. Install htop: sudo apt install htop
 	a. Essentially like Task Manager but for Linux
 10. Set Swappiness: see PDFs
-	a. Currently set to 10
+	a. Currently set to 1
 
 ***If you get this error: "Invoke-WebRequest : The request was aborted: Could not create SSL/TLS secure channel."
 - Run: [Net.ServicePointManager]::SecurityProtocol = "Tls, Tls11, Tls12, Ssl3"
