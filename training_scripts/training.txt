@@ -1,0 +1,3 @@
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D ### all --npz --disable_postprocessing_on_folds -pretrained_weights PATH
+
+

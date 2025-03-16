@@ -1,0 +1,15 @@
+set nnUNet_raw_data_base=D:\Darren\Files\training\nnUNet_raw_data_base
+set nnUNet_preprocessed=D:\Darren\Files\training\nnUNet_preprocessed
+set RESULTS_FOLDER=D:\Darren\Files\training\nnUNet_trained_models
+
+set nnUNet_raw_data_base=C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_raw_data_base
+set nnUNet_preprocessed=C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_preprocessed
+set RESULTS_FOLDER=C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_trained_models
+
+set nnUNet_raw_data_base=C:\Senior_Design\training\nnUNet_raw_data_base
+set nnUNet_preprocessed=C:\Senior_Design\training\nnUNet_preprocessed
+set RESULTS_FOLDER=C:\Senior_Design\training\nnUNet_trained_models
+
+export nnUNet_raw_data_base="/home/dchen/Senior_Design/training/nnUNet_raw_data_base"
+export nnUNet_preprocessed="/home/dchen/Senior_Design/training/nnUNet_preprocessed"
+export RESULTS_FOLDER="/home/dchen/Senior_Design/training/nnUNet_trained_models"

@@ -1,0 +1,6 @@
+Task 500
+- Preprocessed instance segmentation images
+- 'resample_first' was set to False
+
+Task 501
+- Preprocessed border-core representation images
