@@ -1,0 +1,7 @@
+setx nnUNet_raw_data_base D:\Darren\Files\training\nnUNet_raw_data_base
+setx nnUNet_preprocessed D:\Darren\Files\training\nnUNet_preprocessed
+setx RESULTS_FOLDER D:\Darren\Files\training\nnUNet_trained_models
+
+setx nnUNet_raw_data_base C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_raw_data_base
+setx nnUNet_preprocessed C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_preprocessed
+setx RESULTS_FOLDER C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files\training\nnUNet_trained_models
