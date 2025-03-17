@@ -97,7 +97,7 @@ def process_image_slice(image_slice, image, i, tiff_output_dir):
     """Process a single image slice and save it as a TIFF."""
     tifffile.imwrite(os.path.join(tiff_output_dir, f"{image}_{i:04d}.tiff"), image_slice)
 
-def process_image(image, zarr_dir, tiff_dir):
+def process_image(image, zarr_dir, tiff_dir, to_binary):
     """Process a single Zarr image, converting all slices to TIFF."""
     image_path = os.path.join(zarr_dir, image)
     zarr_input = os.path.join(image_path, f"{image}.zarr")
@@ -107,13 +107,14 @@ def process_image(image, zarr_dir, tiff_dir):
         return
 
     image_zarr = zarr.open(zarr_input, mode='r')
-    image_zarr_remapped = remap_labels_binary(image_zarr)
+    if to_binary:
+        image_zarr = remap_labels_binary(image_zarr)
     tiff_output_dir = safe_makedirs(os.path.join(tiff_dir, image))
 
-    for i in tqdm(range(image_zarr_remapped.shape[0]), desc=f"Converting {image}", leave=False):
-        process_image_slice(image_zarr_remapped[i], image, i, tiff_output_dir)
+    for i in tqdm(range(image_zarr.shape[0]), desc=f"Converting {image}", leave=False):
+        process_image_slice(image_zarr[i], image, i, tiff_output_dir)
 
-def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None):
+def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None, to_binary=False):
     """Convert all Zarr images in a directory to TIFF format using multiprocessing with tqdm."""
     print(f"Zarr Directory: {zarr_dir}")
     print(f"TIFF Directory: {tiff_dir}")
@@ -123,7 +124,7 @@ def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None):
 
     is_valid_zarr_directory(zarr_dir, image_list)
 
-    p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=multiprocessing.cpu_count())
+    p_map(lambda img: process_image(img, zarr_dir, tiff_dir, to_binary), image_list, num_cpus=multiprocessing.cpu_count())
     # p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=32)
 
     print("Conversion complete.")

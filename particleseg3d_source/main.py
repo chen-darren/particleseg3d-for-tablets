@@ -589,28 +589,27 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
     
     print("Inference completed successfully!")
 
-def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU'):
+def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', folds=(0, 1, 2, 3, 4), to_binary=False):
     input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
 
-    run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy)
-    func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name)
+    run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy, folds=folds)
+    func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, name, to_binary)
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
     weights_tag = 'original_particle_seg'
-    # metadata = 'tab40_gen35_clar35'
-    metadata = 'pretrained_tab60'
+    metadata = 'tab40_gen35_clar35'
     
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy)
+    to_binary = False
 
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_gen35_zscore4', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
-
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_clar35_zscore5', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy)
-
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['2_Tablet'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['4_GenericD12'], strategy=strategy)
-    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_zscore245', metadata=metadata, name=['5_ClaritinD12'], strategy=strategy)
+    # main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary)
+    
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold0', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold1', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary)
