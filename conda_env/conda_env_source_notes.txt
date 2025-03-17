@@ -20,7 +20,7 @@ Things Needed
 - For TIFF viewer
 	- pip install "napari[all]"
 - For TIFF to Video
-	pip install imageio
+	pip install imageio[ffmpeg]
 - For showing images from ratio_detected.ipynb
 - For semantic to instance
 	- pip3 install opencv-python
@@ -40,7 +40,7 @@ pip install ParticleSeg3D
 pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 conda install ipykernel
 pip install "napari[all]"
-pip install imageio
+pip install imageio[ffmpeg]
 conda install conda-forge::matplotlib
 pip3 install opencv-python
 pip install imagecodecs
@@ -57,7 +57,7 @@ pip install ParticleSeg3D
 pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 mamba install ipykernel
 pip install "napari[all]"
-pip install imageio
+pip install imageio[ffmpeg]
 conda install conda-forge::matplotlib
 pip3 install opencv-python
 pip install imagecodecs
@@ -78,7 +78,7 @@ pip install ParticleSeg3D
 pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 mamba install ipykernel
 pip install "napari[all]"
-pip install imageio
+pip install imageio[ffmpeg]
 conda install conda-forge::matplotlib
 pip3 install opencv-python
 pip install imagecodecs
