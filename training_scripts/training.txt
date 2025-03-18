@@ -1,3 +1,5 @@
 nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D ### all --npz --disable_postprocessing_on_folds -pretrained_weights PATH
 
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 500 all --npz --disable_postprocessing_on_folds -pretrained_weights \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\weights\original_particle_seg\nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1\fold_0\model_best.model
 
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 501 all --npz --disable_postprocessing_on_folds -pretrained_weights \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\weights\original_particle_seg\nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1\fold_0\model_best.model
