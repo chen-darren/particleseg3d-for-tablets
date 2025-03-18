@@ -2,3 +2,5 @@ robocopy \orignal_path \destination_path /E /Z /R:3 /W:10
 robocopy R:\ENGR_Chon\Darren\NIH_Pulsewatch\TFS_pt\pulsewatch_simband C:\Chon_Lab\NIH_Pulsewatch\TFS_pt\pulsewatch_simband /E /Z /R:3 /W:10
 
 robocopy \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\training\nnUNet_raw_data_base\nnUNet_cropped_data\Task501_ParticleSeg3D D:\Senior_Design\training\nnUNet_raw_data_base\nnUNet_cropped_data\Task501_ParticleSeg3D /E /Z /R:3 /W:10
+
+robocopy \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\training\nnUNet_raw_data_base\nnUNet_cropped_data\Task501_ParticleSeg3D D:\Senior_Design\training\nnUNet_raw_data_base\nnUNet_cropped_data\Task501_ParticleSeg3D /E /Z /R:3 /W:10
