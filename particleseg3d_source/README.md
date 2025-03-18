@@ -38,8 +38,12 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
     - `'dp'` for DataParallel
     - `'ddp'` for DistributedDataParallel with GLOO Backend (NCCL is not supported on Windows)
     - `'singleGPU'` for no multi-GPU processing
-9. Specify the Z-Score desired
-    - Set `zscore` to the desired tuple containing `(mean, std)`. Defaults to the original from the ParticleSeg3D paper.
+9. Specify the folds desired for the ensemble
+    - Set `folds` to the desired tuple/list containing `0, 1, 2, 3, and/or 4`. Defaults to all folds: `(0, 1, 2, 3, 4)`.
+10. Specify whether the TIFF output should be saved as a binary mask
+    - Set `is_binary` to `True` to convert the Zarr into a binary mask TIFF stack
+11. Specify whether or not metrics shoudl be computed
+    - Set `metrics` to `True` to compute and save metrics
 
 ### Ready to Go!
 - Can run `main.py` to perform inference.
