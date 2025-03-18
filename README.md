@@ -13,7 +13,7 @@ By Darren Chen for the Biomedical Engineering Senior Design Project at the Unive
 - Access the subprocess module implementation in `Senior_Design/particleseg3d_ssubprocess` and see the local README file for additional information.
 
 ## Adapted From
-Gotkowski, K., Gupta, S., Godinho, J. R. A., Tochtrop, C. G. S., Maier-Hein, K. H., & Isensee, F. (2024). ParticleSeg3D: A scalable out-of-the-box deep learning segmentation solution for individual particle characterization from micro CT images in mineral processing and recycling. *Powder Technology, 434*, 119286. https://doi.org/10.1016/j.powtec.2024.119286
+Gotkowski, K., Gupta, S., Godinho, J. R. A., Tochtrop, C. G. S., Maier-Hein, K. H., & Isensee, F. (2024). ParticleSeg3D: A scalable out-of-the-box deep learning segmentation solution for individual particle characterization from micro CT images in mineral processing and recycling. *Powder Technology, 434*, 119286. [https://doi.org/10.1016/j.powtec.2024.119286](https://doi.org/10.1016/j.powtec.2023.119286)
 
 Note: The software is available at GitHub: [https://github.com/MIC-DKFZ/ParticleSeg3D](https://github.com/MIC-DKFZ/ParticleSeg3D)
 
