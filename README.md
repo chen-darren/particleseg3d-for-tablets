@@ -12,3 +12,13 @@ By Darren Chen for the Biomedical Engineering Senior Design Project at the Unive
 - Note that multi-GPU processing is NOT supported in the subprocess module implementation
 - Access the subprocess module implementation in `Senior_Design/particleseg3d_ssubprocess` and see the local README file for additional information.
 
+Adapted From:
+@article{gotkowski2024particleseg3d,
+  title={ParticleSeg3D: A scalable out-of-the-box deep learning segmentation solution for individual particle characterization from micro CT images in mineral processing and recycling},
+  author={Gotkowski, Karol and Gupta, Shuvam and Godinho, Jose RA and Tochtrop, Camila GS and Maier-Hein, Klaus H and Isensee, Fabian},
+  journal={Powder Technology},
+  volume={434},
+  pages={119286},
+  year={2024},
+  publisher={Elsevier}
+}
