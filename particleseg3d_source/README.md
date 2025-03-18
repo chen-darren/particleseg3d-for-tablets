@@ -41,9 +41,11 @@ Go to the calling of the `main` function in `particleseg3d_source/main.py`
 9. Specify the folds desired for the ensemble
     - Set `folds` to the desired tuple/list containing `0, 1, 2, 3, and/or 4`. Defaults to all folds: `(0, 1, 2, 3, 4)`.
 10. Specify whether the TIFF output should be saved as a binary mask
-    - Set `is_binary` to `True` to convert the Zarr into a binary mask TIFF stack
-11. Specify whether or not metrics shoudl be computed
-    - Set `metrics` to `True` to compute and save metrics
+    - Set `is_binary` to `True` to convert the Zarr into a binary mask TIFF stack.
+11. Specify whether or not metrics should be computed.
+    - Set `metrics` to `True` to compute and save metrics.
+12. Specify whether or not videos should be generated
+    - Set `video` to `True` to compute and save videos.
 
 ### Ready to Go!
 - Can run `main.py` to perform inference.
