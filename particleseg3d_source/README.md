@@ -4,7 +4,7 @@
 ### Set Correct Paths
 Go to `setup_paths` in `particleseg3d_source/utils/darren_func.py`
 - Specify each 'base_path' to the correct path.
-- ```
+```
     # Set path to the base directory
     if dir_location.lower() == 'internal':
         base_path = r'\path\to\internal\drive'
@@ -13,7 +13,8 @@ Go to `setup_paths` in `particleseg3d_source/utils/darren_func.py`
     elif dir_location.lower() == 'cloud':
         base_path = r'\path\to\cloud'
     elif dir_location.lower() == 'refine':
-        base_path = r'\path\to\refine'
+        base_path = r'\path\to\refine
+```
 
 ### Configurables
 Go to the calling of the `main` function in `particleseg3d_source/main.py`
