@@ -159,3 +159,73 @@ def setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weight
 
     print('Paths set')
     return input_path, output_zarr_path, output_tiff_path, weights_path
+class PathMaster:
+    def __init__(self, dir_location, output_to_cloud, run_tag, is_original_data, weights_tag):
+        self.dir_location = dir_location.lower()
+        self.output_to_cloud = output_to_cloud
+        self.run_tag = run_tag
+        self.is_original_data = is_original_data
+        self.weights_tag = weights_tag
+        
+        self.base_path = self.get_base_path()
+        self.setup_paths()
+
+    def get_base_path(self):
+        paths = {
+            'internal': r'C:\Senior_Design',
+            'external': r'D:\Senior_Design',
+            'cloud': r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files',
+            'refine': r'D:\Darren\Files'
+        }
+        if self.dir_location not in paths:
+            raise ValueError('Invalid directory location type')
+        return paths[self.dir_location]
+
+    def setup_paths(self):
+        self.base_database_path = os.path.join(self.base_path, 'database')
+        self.base_output_path = os.path.join(self.base_path, 'outputs')
+        self.base_weights_path = os.path.join(self.base_path, 'weights')
+        
+        if self.output_to_cloud:
+            self.base_output_path = os.path.join(r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
+        
+        self.pred_zarr_path = os.path.join(self.base_output_path, 'zarr', self.run_tag)
+        self.pred_tiff_path = os.path.join(self.base_output_path, 'tiff', self.run_tag)
+        
+        dataset_type = 'orignal_dataset' if self.is_original_data else 'tablet_dataset'
+        self.grayscale_path = os.path.join(self.base_database_path, dataset_type, 'grayscale', 'dataset')
+        self.weights_path = os.path.join(self.base_weights_path, self.weights_tag)
+        
+        # PSD Paths
+        self.psd_path = os.path.join(self.base_output_path, 'metrics', 'particle_size_dist')
+        
+        # Ground Truth Paths
+        self.gt_sem_path = os.path.join(self.base_database_path, dataset_type, 'binary', 'tiff')
+        self.gt_inst_path = os.path.join(self.base_database_path, dataset_type, 'instance', 'tiff')
+        
+        # Metrics Paths
+        self.sem_metrics_path = os.path.join(self.base_output_path, 'metrics', 'semantic_metrics')
+        
+        # Check directories
+        input_paths = [self.grayscale_path, self.weights_path, self.gt_sem_path, self.gt_inst_path]
+        output_paths = [self.pred_zarr_path, self.pred_tiff_path, self.psd_path, self.sem_metrics_path]
+        bad_input_paths = []
+        bad_output_paths = []
+        
+        for input_path in input_paths:
+            if not os.path.isdir(input_path):
+                bad_input_paths.append(input_path)
+        for output_path in output_paths:
+            if not os.path.isdir(output_path):
+                bad_output_paths.append(output_path)
+                os.makedirs(output_path)
+        
+        if len(bad_input_paths) > 0:
+            raise ValueError('The following input paths were not defined:', bad_input_paths)
+        else:
+            print('All input paths were properly created')
+        
+        if len(bad_output_paths) > 0:
+            print('The following output paths were just created:', bad_output_paths)
+        else:
+            print('All input paths were properly defined')
