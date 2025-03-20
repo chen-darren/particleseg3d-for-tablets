@@ -1,5 +1,11 @@
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D ### all --npz --disable_postprocessing_on_folds -pretrained_weights PATH
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D ### fold --npz --disable_postprocessing_on_folds -pretrained_weights PATH
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 500 all --npz --disable_postprocessing_on_folds -pretrained_weights \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\weights\original_particle_seg\nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1\fold_0\model_best.model
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 500 0 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 501 all --npz --disable_postprocessing_on_folds -pretrained_weights \\wsl.localhost\Ubuntu\home\dchen\Senior_Design\weights\original_particle_seg\nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1\fold_0\model_best.model
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 501 4 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
+
+***At "\\wsl.localhost\Ubuntu\home\dchen\anaconda3\envs\Senior_Design_py310_source\lib\python3.10\site-packages\nnunet\training\network_training\nnUNetTrainerV2_ParticleSeg3D.py"
+- Change (Line 16): self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data", "nnUNet_raw_data", task_name)
+- To (Line 16): self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data_base", "nnUNet_raw_data", task_name)
+
+***if fold==all then we use all images for training and validation

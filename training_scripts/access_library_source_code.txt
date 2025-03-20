@@ -1,2 +1,3 @@
 For nnUNet
-C:\Users\ZEISS\anaconda3\envs\Senior_Design_py310_source\Lib\site-packages\nnunet
+Windows: C:\Users\ZEISS\anaconda3\envs\Senior_Design_py310_source\Lib\site-packages\nnunet
+Linux: \\wsl.localhost\Ubuntu\home\dchen\anaconda3\envs\Senior_Design_py310_source\lib\python3.10\site-packages\nnunet
