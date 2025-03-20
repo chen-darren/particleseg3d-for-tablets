@@ -146,16 +146,16 @@ def interpolate_on_multiple_gpus(image, target_shape, size_conversion_factor, mo
     # Combine the two parts back along the depth axis
     result_image = torch.cat([image_part1_resampled, image_part2_resampled], dim=2)
 
-    # Check shapes
-    print("\nInitial shape:", image.shape[-3:])
-    print("Image part 1 shape:", image_part1.shape)
-    print("Image part 2 shape:", image_part2.shape)
-    print("Target shape:", target_shape)
-    print("Image part 1 resampled shape:", target_size_part1)
-    print("Image part 2 resampled shape:", target_size_part2)
-    print("Image part 1 resampled (no overlap) shape:", image_part1_resampled.shape)
-    print("Image part 2 resampled (no overlap) shape:", image_part2_resampled.shape)
-    print("Result image shape:", result_image.shape)
+    # # Check shapes
+    # print("\nInitial shape:", image.shape[-3:])
+    # print("Image part 1 shape:", image_part1.shape)
+    # print("Image part 2 shape:", image_part2.shape)
+    # print("Target shape:", target_shape)
+    # print("Image part 1 resampled shape:", target_size_part1)
+    # print("Image part 2 resampled shape:", target_size_part2)
+    # print("Image part 1 resampled (no overlap) shape:", image_part1_resampled.shape)
+    # print("Image part 2 resampled (no overlap) shape:", image_part2_resampled.shape)
+    # print("Result image shape:", result_image.shape)
     
     # Clear CUDA cache
     empty_cache_for_all_gpus()
