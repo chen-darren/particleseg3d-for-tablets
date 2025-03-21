@@ -58,10 +58,18 @@ def filter_by_iqr(instance_labels, volume, surface_areas, diameters, threshold_f
     mask = (volume >= lower_bound) & (volume <= upper_bound)
     return instance_labels[mask], volume[mask], surface_areas[mask], diameters[mask]
 
-def filter_by_volume(instance_labels, volumes, surface_areas, diameters, volume_threshold=6000):
+def filter_by_threshold(instance_labels, volumes, surface_areas, diameters, threshold=('diameter', 50)):
     """Filter particles based on a volume threshold."""
-    mask = volumes <= volume_threshold
-    return instance_labels[mask], volumes[mask], surface_areas[mask], diameters[mask]
+    if threshold[0] == 'volume':
+        mask = volumes <= threshold[1]
+    elif threshold[0] == 'surface area':
+        mask = surface_areas <= threshold[1]
+    elif threshold[0] == 'diameter':
+        mask = diameters <= threshold[1]
+    else:
+        raise ValueError('The threshold type must be either \`volume\`, \`surface area\`, or \`diameter\`!')
+     
+    return instance_labels[mask], volumes[mask], surface_areas[mask], diameters[mask], threshold
 
 def bin_data(data, bin_edges):
     """Bin the data according to the bin edges and return the bin counts."""
@@ -95,23 +103,33 @@ def save_histogram(data, bin_edges, title, xlabel, save_path):
     plt.savefig(save_path, dpi=300)
     plt.close()
 
-def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50, fixed=False):
+def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50, threshold=None):
     """Save binned Particle Size Distribution (PSD) to CSV."""
-    if not fixed:
+    volume_min = 0
+    surface_area_min = 0
+    diameter_min = 0
+    
+    if threshold is None:
         # Calculate the range for each dataset and round accordingly
-        volume_min = np.floor(min(volumes))  # Round down
         volume_max = np.ceil(max(volumes))   # Round up
-        surface_area_min = np.floor(min(surface_areas))  # Round down
         surface_area_max = np.ceil(max(surface_areas))   # Round up
-        diameter_min = np.floor(min(diameters))  # Round down
         diameter_max = np.ceil(max(diameters))   # Round up
     else:
-        volume_min = 0
-        volume_max = 6000
-        surface_area_min = 0
-        surface_area_max = 6000
-        diameter_min = 0
-        diameter_max = 25
+        if threshold[0] == 'volume':
+            volume_max = threshold[1]
+            diameter_max = np.ceil((6 * volume_max / np.pi) ** (1/3))
+            surface_area_max = np.ceil(4 * np.pi * (diameter_max / 2) ** 2)
+        elif threshold[0] == 'surface area':
+            surface_area_max = threshold[1]
+            diameter_max = np.ceil(np.sqrt(surface_area_max / (4 * np.pi)) * 2)
+            volume_max = np.ceil((4/3) * np.pi * (diameter_max / 2) ** 3)
+            print('Please note that thresholding based on surface area may lead to odd binned histograms due to the very approximate estimation of surface area that is not directly related to volume or diameter.')
+        elif threshold[0] == 'diameter':
+            diameter_max = threshold[1]
+            volume_max = np.ceil((4/3) * np.pi * (diameter_max / 2) ** 3)
+            surface_area_max = np.ceil(4 * np.pi * (diameter_max / 2) ** 2)
+        else:
+            raise ValueError('The threshold type must be either \`volume\`, \`surface area\`, or \`diameter\`!')
 
     def create_bins(min_val, max_val, num_bins):
         bin_range = max_val - min_val
@@ -121,6 +139,20 @@ def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50, f
             extra_bins = num_bins - bin_range  # Add extra bins if range is small
             return np.linspace(min_val, max_val + extra_bins, num_bins + 1, dtype=int)
 
+    def create_log_bins(min_val, max_val, num_bins, epsilon=1e-6):
+        # Shift values to avoid log(0) error
+        min_val = max(min_val, epsilon)
+        log_min = np.log10(min_val)
+        log_max = np.log10(max_val)
+        log_bins = np.logspace(log_min, log_max, num_bins + 1)
+        return np.unique(log_bins)
+    
+    def create_power_bins(min_val, max_val, num_bins, power=2):
+        # Create bins using a power law scaling
+        bins = np.linspace(min_val ** power, max_val ** power, num_bins + 1) ** (1 / power)
+        return np.unique(np.round(bins).astype(int))
+
+    # Create bins for volume and surface area using logarithmic spacing
     volume_bins = create_bins(volume_min, volume_max, num_bins)
     surface_area_bins = create_bins(surface_area_min, surface_area_max, num_bins)
     diameter_bins = np.linspace(diameter_min, diameter_max, num_bins + 1)
@@ -131,7 +163,7 @@ def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50, f
 
     volume_bin_ranges = [f"{v1}.0-{v2}.0" for v1, v2 in zip(volume_bins[:-1], volume_bins[1:])]
     surface_area_bin_ranges = [f"{s1}.0-{s2}.0" for s1, s2 in zip(surface_area_bins[:-1], surface_area_bins[1:])]
-    diameter_bin_ranges = [f"{d1}.0-{d2}.0" for d1, d2 in zip(diameter_bins[:-1], diameter_bins[1:])]
+    diameter_bin_ranges = [f"{d1}-{d2}" for d1, d2 in zip(diameter_bins[:-1], diameter_bins[1:])]
 
     binned_df = pd.DataFrame({
         "Volume Bin Range": volume_bin_ranges,
@@ -248,15 +280,15 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
             iqr_filt_csv_path = os.path.join(table_folder, f"{name}_iqr_filt_psd.csv")
             save_psd_to_csv(iqr_filt_instance_labels, iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, iqr_filt_csv_path)
 
-            # Save volume-filtered CSV
-            vol_filt_instance_labels, vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters = filter_by_volume(instance_labels, volumes, surface_areas, diameters)
-            vol_filt_csv_path = os.path.join(table_folder, f"{name}_vol_filt_psd.csv")
-            save_psd_to_csv(vol_filt_instance_labels, vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, vol_filt_csv_path)
+            # Save threshold-filtered CSV
+            thresh_filt_instance_labels, thresh_filt_volumes, thresh_filt_surface_areas, thresh_filt_diameters, threshold = filter_by_threshold(instance_labels, volumes, surface_areas, diameters)
+            thresh_filt_csv_path = os.path.join(table_folder, f"{name}_thresh_filt_psd.csv")
+            save_psd_to_csv(thresh_filt_instance_labels, thresh_filt_volumes, thresh_filt_surface_areas, thresh_filt_diameters, thresh_filt_csv_path)
 
             # Save binned PSD CSVs
             raw_volume_bins, raw_surface_area_bins, raw_diameter_bins = save_binned_psd(volumes, surface_areas, diameters, os.path.join(table_folder, f"{name}_raw_binned_psd.csv"), num_bins=75)
             iqr_filt_volume_bins, iqr_filt_surface_area_bins, iqr_filt_diameter_bins = save_binned_psd(iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, os.path.join(table_folder, f"{name}_iqr_filt_binned_psd.csv"), num_bins=75)
-            vol_filt_volume_bins, vol_filt_surface_area_bins, vol_filt_diameter_bins = save_binned_psd(vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, os.path.join(table_folder, f"{name}_vol_filt_binned_psd.csv"), num_bins=75, fixed=True)
+            thresh_filt_volume_bins, thresh_filt_surface_area_bins, thresh_filt_diameter_bins = save_binned_psd(thresh_filt_volumes, thresh_filt_surface_areas, thresh_filt_diameters, os.path.join(table_folder, f"{name}_thresh_filt_binned_psd.csv"), num_bins=75, threshold=threshold)
 
             # Save histograms
             save_histogram(volumes, raw_volume_bins, "Raw Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_raw_volume_hist.png"))
@@ -267,13 +299,13 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
             save_histogram(iqr_filt_volumes, iqr_filt_volume_bins, "IQR-Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_volume_hist.png"))
             save_histogram(iqr_filt_surface_areas, iqr_filt_surface_area_bins, "IQR-Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_surface_hist.png"))
             save_histogram(iqr_filt_diameters, iqr_filt_diameter_bins, "IQR-Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_diameter_hist.png"))
-            save_histogram(vol_filt_volumes, vol_filt_volume_bins, "Volume-Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_volume_hist.png"))
-            save_histogram(vol_filt_surface_areas, vol_filt_surface_area_bins, "Volume-Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_surface_hist.png"))
-            save_histogram(vol_filt_diameters, vol_filt_diameter_bins, "Volume-Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_diameter_hist.png"))
+            save_histogram(thresh_filt_volumes, thresh_filt_volume_bins, "Threshold-Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_thresh_filt_volume_hist.png"))
+            save_histogram(thresh_filt_surface_areas, thresh_filt_surface_area_bins, "Threshold-Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_thresh_filt_surface_hist.png"))
+            save_histogram(thresh_filt_diameters, thresh_filt_diameter_bins, "Threshold-Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_thresh_filt_diameter_hist.png"))
 
             # Save summary metrics
             save_summary_metrics(volumes, surface_areas, diameters, save_dir, run_tag, name, prefix="raw")
             save_summary_metrics(iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, save_dir, run_tag, name, prefix="iqr_filt")
-            save_summary_metrics(vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, save_dir, run_tag, name, prefix="vol_filt")
+            save_summary_metrics(thresh_filt_volumes, thresh_filt_surface_areas, thresh_filt_diameters, save_dir, run_tag, name, prefix="thresh_filt")
 
             print(f"Saved results for {name}.\n")
