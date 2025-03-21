@@ -44,24 +44,40 @@ def compute_psd(segmentation):
 
     return np.array(instance_labels), np.array(volumes), np.array(surface_areas), np.array(diameters)
 
-def remove_outliers(data):
-    """Remove outliers using the IQR method and return both filtered data and kept indices."""
-    if len(data) == 0:
-        return data, np.arange(len(data))  # Return empty array and indices
+def filter_by_iqr(instance_labels, volume, surface_areas, diameters, threshold_factor=7.5):
+    """Remove outliers using the IQR method and return filtered data."""
+    if len(volume) == 0:
+        return instance_labels, volume, surface_areas, diameters  # Return empty if no data
 
-    Q1 = np.percentile(data, 25)
-    Q3 = np.percentile(data, 75)
+    Q1 = np.percentile(volume, 25)
+    Q3 = np.percentile(volume, 75)
     IQR = Q3 - Q1
-    lower_bound = Q1 - 7.5 * IQR
-    upper_bound = Q3 + 7.5 * IQR
+    lower_bound = Q1 - threshold_factor * IQR
+    upper_bound = Q3 + threshold_factor * IQR
 
-    mask = (data >= lower_bound) & (data <= upper_bound)  # Boolean mask for non-outliers
-    return data[mask], np.where(mask)[0]  # Return filtered data and valid indices
+    mask = (volume >= lower_bound) & (volume <= upper_bound)
+    return instance_labels[mask], volume[mask], surface_areas[mask], diameters[mask]
+
+def filter_by_volume(instance_labels, volumes, surface_areas, diameters, volume_threshold=6000):
+    """Filter particles based on a volume threshold."""
+    mask = volumes <= volume_threshold
+    return instance_labels[mask], volumes[mask], surface_areas[mask], diameters[mask]
 
 def bin_data(data, bin_edges):
     """Bin the data according to the bin edges and return the bin counts."""
     counts, _ = np.histogram(data, bins=bin_edges)
     return counts
+
+def save_psd_to_csv(instance_labels, volumes, surface_areas, diameters, save_path):
+    """Apply outlier removal using IQR and save results to CSV."""
+    df = pd.DataFrame({
+        "Instance": instance_labels,
+        "Volume": volumes,
+        "Surface Area": surface_areas,
+        "Diameter": diameters
+    })
+    df.to_csv(save_path, index=False)
+    print(f"Saved PSD as CSV to {save_path}")
 
 def save_histogram(data, bin_edges, title, xlabel, save_path):
     """Save histogram plot with scaled x-axis, excluding zero values."""
@@ -79,15 +95,23 @@ def save_histogram(data, bin_edges, title, xlabel, save_path):
     plt.savefig(save_path, dpi=300)
     plt.close()
 
-def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50):
+def save_binned_psd(volumes, surface_areas, diameters, save_path, num_bins=50, fixed=False):
     """Save binned Particle Size Distribution (PSD) to CSV."""
-    # Calculate the range for each dataset and round accordingly
-    volume_min = np.floor(min(volumes))  # Round down
-    volume_max = np.ceil(max(volumes))   # Round up
-    surface_area_min = np.floor(min(surface_areas))  # Round down
-    surface_area_max = np.ceil(max(surface_areas))   # Round up
-    diameter_min = np.floor(min(diameters))  # Round down
-    diameter_max = np.ceil(max(diameters))   # Round up
+    if not fixed:
+        # Calculate the range for each dataset and round accordingly
+        volume_min = np.floor(min(volumes))  # Round down
+        volume_max = np.ceil(max(volumes))   # Round up
+        surface_area_min = np.floor(min(surface_areas))  # Round down
+        surface_area_max = np.ceil(max(surface_areas))   # Round up
+        diameter_min = np.floor(min(diameters))  # Round down
+        diameter_max = np.ceil(max(diameters))   # Round up
+    else:
+        volume_min = 0
+        volume_max = 6000
+        surface_area_min = 0
+        surface_area_max = 6000
+        diameter_min = 0
+        diameter_max = 25
 
     def create_bins(min_val, max_val, num_bins):
         bin_range = max_val - min_val
@@ -216,47 +240,40 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
             os.makedirs(hist_folder, exist_ok=True)
 
             # Save original CSV
-            csv_path = os.path.join(table_folder, f"{name}_raw_psd.csv")
-            df = pd.DataFrame({
-                "Instance": instance_labels,
-                "Volume": volumes,
-                "Surface Area": surface_areas,
-                "Diameter": diameters
-            })
-            df = df[df["Volume"] > 0]  # Ensure zero values are excluded
-            df.to_csv(csv_path, index=False)
+            orignal_csv_path = os.path.join(table_folder, f"{name}_raw_psd.csv")
+            save_psd_to_csv(instance_labels, volumes, surface_areas, diameters, orignal_csv_path)
 
-            # Save filtered CSV (outliers removed)
-            filtered_volumes, valid_indices = remove_outliers(volumes)
-            filtered_surface_areas = surface_areas[valid_indices]
-            filtered_diameters = diameters[valid_indices]
-            filtered_instance_labels = instance_labels[valid_indices]  # Ensure labels match filtered data
+            # Save IQR-filtered CSV
+            iqr_filt_instance_labels, iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters = filter_by_iqr(instance_labels, volumes, surface_areas, diameters)
+            iqr_filt_csv_path = os.path.join(table_folder, f"{name}_iqr_filt_psd.csv")
+            save_psd_to_csv(iqr_filt_instance_labels, iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, iqr_filt_csv_path)
 
-            filtered_csv_path = os.path.join(table_folder, f"{name}_filtered_psd.csv")
-            filtered_df = pd.DataFrame({
-                "Instance": filtered_instance_labels,
-                "Volume": filtered_volumes,
-                "Surface Area": filtered_surface_areas,
-                "Diameter": filtered_diameters
-            })
-            filtered_df.to_csv(filtered_csv_path, index=False)
+            # Save volume-filtered CSV
+            vol_filt_instance_labels, vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters = filter_by_volume(instance_labels, volumes, surface_areas, diameters)
+            vol_filt_csv_path = os.path.join(table_folder, f"{name}_vol_filt_psd.csv")
+            save_psd_to_csv(vol_filt_instance_labels, vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, vol_filt_csv_path)
 
             # Save binned PSD CSVs
-            raw_volume_bins, raw_surface_area_bins, raw_diameter_bins = save_binned_psd(volumes, surface_areas, diameters, os.path.join(table_folder, f"{name}_raw_binned_psd.csv"), num_bins=50)
-            filtered_volume_bins, filtered_surface_area_bins, filtered_diameter_bins = save_binned_psd(filtered_volumes, filtered_surface_areas, filtered_diameters, os.path.join(table_folder, f"{name}_filtered_binned_psd.csv"), num_bins=50)
+            raw_volume_bins, raw_surface_area_bins, raw_diameter_bins = save_binned_psd(volumes, surface_areas, diameters, os.path.join(table_folder, f"{name}_raw_binned_psd.csv"), num_bins=75)
+            iqr_filt_volume_bins, iqr_filt_surface_area_bins, iqr_filt_diameter_bins = save_binned_psd(iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, os.path.join(table_folder, f"{name}_iqr_filt_binned_psd.csv"), num_bins=75)
+            vol_filt_volume_bins, vol_filt_surface_area_bins, vol_filt_diameter_bins = save_binned_psd(vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, os.path.join(table_folder, f"{name}_vol_filt_binned_psd.csv"), num_bins=75, fixed=True)
 
             # Save histograms
-            save_histogram(volumes, raw_volume_bins, "Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_raw_volume_hist.png"))
-            save_histogram(surface_areas, raw_surface_area_bins, "Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_raw_surface_hist.png"))
-            save_histogram(diameters, raw_diameter_bins, "Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_raw_diameter_hist.png"))
+            save_histogram(volumes, raw_volume_bins, "Raw Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_raw_volume_hist.png"))
+            save_histogram(surface_areas, raw_surface_area_bins, "Raw Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_raw_surface_hist.png"))
+            save_histogram(diameters, raw_diameter_bins, "Raw Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_raw_diameter_hist.png"))
 
             # Save filtered histograms
-            save_histogram(filtered_volumes, filtered_volume_bins, "Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_filtered_volume_hist.png"))
-            save_histogram(filtered_surface_areas, filtered_surface_area_bins, "Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_filtered_surface_hist.png"))
-            save_histogram(filtered_diameters, filtered_diameter_bins, "Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_filtered_diameter_hist.png"))
+            save_histogram(iqr_filt_volumes, iqr_filt_volume_bins, "IQR-Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_volume_hist.png"))
+            save_histogram(iqr_filt_surface_areas, iqr_filt_surface_area_bins, "IQR-Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_surface_hist.png"))
+            save_histogram(iqr_filt_diameters, iqr_filt_diameter_bins, "IQR-Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_iqr_filt_diameter_hist.png"))
+            save_histogram(vol_filt_volumes, vol_filt_volume_bins, "Volume-Filtered Particle Volume Distribution", "Volume (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_volume_hist.png"))
+            save_histogram(vol_filt_surface_areas, vol_filt_surface_area_bins, "Volume-Filtered Particle Surface Area Distribution", "Surface Area (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_surface_hist.png"))
+            save_histogram(vol_filt_diameters, vol_filt_diameter_bins, "Volume-Filtered Particle Diameter Distribution", "Diameter (voxels)", os.path.join(hist_folder, f"{name}_vol_filt_diameter_hist.png"))
 
             # Save summary metrics
             save_summary_metrics(volumes, surface_areas, diameters, save_dir, run_tag, name, prefix="raw")
-            save_summary_metrics(filtered_volumes, filtered_surface_areas, filtered_diameters, save_dir, run_tag, name, prefix="filtered")
+            save_summary_metrics(iqr_filt_volumes, iqr_filt_surface_areas, iqr_filt_diameters, save_dir, run_tag, name, prefix="iqr_filt")
+            save_summary_metrics(vol_filt_volumes, vol_filt_surface_areas, vol_filt_diameters, save_dir, run_tag, name, prefix="vol_filt")
 
             print(f"Saved results for {name}.\n")
