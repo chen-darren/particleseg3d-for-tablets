@@ -1,8 +1,11 @@
 nnUNet_plan_and_preprocess -t 500 -pl2d None --verify_dataset_integrity
 nnUNet_plan_and_preprocess -t 501 -pl2d None --verify_dataset_integrity
+nnUNet_plan_and_preprocess -t 502 -pl2d None --verify_dataset_integrity
 
 nnUNet_plan_and_preprocess -t 500 -pl2d None
 nnUNet_plan_and_preprocess -t 501 -pl2d None
+nnUNet_plan_and_preprocess -t 502 -pl2d None
 
 nnUNet_plan_and_preprocess -t 500 -pl2d None -tl 1 -tf 1
 nnUNet_plan_and_preprocess -t 501 -pl2d None -tl 1 -tf 1
+nnUNet_plan_and_preprocess -t 502 -pl2d None -tl 1 -tf 1

@@ -1,0 +1,21 @@
+==========================================================================================================================
+
+\\wsl.localhost\Ubuntu\home\dchen\anaconda3\envs\Senior_Design_py310_source\lib\python3.10\site-packages\nnunet\training\network_training\nnUNetTrainerV2_ParticleSeg3D.py
+
+- Change (Line 16): self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data", "nnUNet_raw_data", task_name)
+- To (Line 16): self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data_base", "nnUNet_raw_data", task_name)
+	- The path name is wrong lol.
+
+Transferred revised version of above script on 3/23/25.
+
+==========================================================================================================================
+
+\\wsl.localhost\Ubuntu\home\dchen\anaconda3\envs\Senior_Design_py310_source\lib\python3.10\site-packages\nnunet\training\network_training\network_trainer.py
+
+- Change (Line 122): self.save_every = 50
+- To (Line 122): self.save_every = 1
+	- Make sure to save after very epoch.
+
+Transferred revised version of above script on 3/23/25.
+
+==========================================================================================================================
