@@ -1,9 +1,9 @@
-from nnunet.training.network_training.nnUNetTrainerV2 import nnUNetTrainerV2_ParticleSeg3D
+from nnunet.training.network_training.nnUNetTrainerV2_ParticleSeg3D import nnUNetTrainerV2_ParticleSeg3D
 from batchgenerators.utilities.file_and_folder_operations import *
 from torch.optim import lr_scheduler
 import torch
 
-class nnUNetTrainerV2_ParticleSeg3D_DarrenSGD(nnUNetTrainerV2_ParticleSeg3D):
+class nnUNetTrainerV2_ParticleSeg3D_DarrenAdam(nnUNetTrainerV2_ParticleSeg3D):
     def __init__(self, plans_file, fold, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
                  unpack_data=True, deterministic=True, fp16=False):
         super().__init__(plans_file, fold, output_folder, dataset_directory, batch_dice, stage, unpack_data,
@@ -26,7 +26,7 @@ class nnUNetTrainerV2_ParticleSeg3D_DarrenSGD(nnUNetTrainerV2_ParticleSeg3D):
                                                            verbose=True, threshold=self.lr_scheduler_eps,
                                                            threshold_mode="abs")
         
-    def maybe_update_lr(self):
+    def maybe_update_lr(self, epochs=None):
         # maybe update learning rate
         if self.lr_scheduler is not None:
             assert isinstance(self.lr_scheduler, (lr_scheduler.ReduceLROnPlateau, lr_scheduler._LRScheduler))

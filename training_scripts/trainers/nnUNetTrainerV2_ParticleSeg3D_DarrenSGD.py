@@ -1,6 +1,5 @@
-from nnunet.training.network_training.nnUNetTrainerV2 import nnUNetTrainerV2_ParticleSeg3D
+from nnunet.training.network_training.nnUNetTrainerV2_ParticleSeg3D import nnUNetTrainerV2_ParticleSeg3D
 from batchgenerators.utilities.file_and_folder_operations import *
-
 
 class nnUNetTrainerV2_ParticleSeg3D_DarrenSGD(nnUNetTrainerV2_ParticleSeg3D):
     def __init__(self, plans_file, fold, output_folder=None, dataset_directory=None, batch_dice=True, stage=None,
