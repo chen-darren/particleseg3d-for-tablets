@@ -14,7 +14,7 @@ class nnUNetTrainerV2_ParticleSeg3D_DarrenAdam(nnUNetTrainerV2_ParticleSeg3D):
         
         # Darren's new and revised variables to overwrite orignals
         self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data_base", "nnUNet_raw_data", task_name)
-        self.save_every = 1
+        self.save_every = 5
         self.initial_lr = 3e-5 # Original Adam LR is 3e-4
     
     def initialize_optimizer_and_scheduler(self):

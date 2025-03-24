@@ -12,5 +12,5 @@ class nnUNetTrainerV2_ParticleSeg3D_DarrenSGD(nnUNetTrainerV2_ParticleSeg3D):
         
         # Darren's new and revised variables to overwrite orignals
         self.raw_data_dir = join("/", *nnunet_datasets_dir, "nnUNet_raw_data_base", "nnUNet_raw_data", task_name)
-        self.save_every = 1
+        self.save_every = 5
         self.initial_lr = 1e-3 # Original SGD LR is 1e-2
