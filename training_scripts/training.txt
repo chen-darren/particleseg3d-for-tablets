@@ -12,6 +12,8 @@ nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 3 --npz --di
 
 nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 3 --npz --disable_postprocessing_on_fold -c
 
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip 502 3 --npz --disable_postprocessing_on_fold -c
+
 ================================================================================================================================
 
 ***if fold==all then we use all images for training and validation

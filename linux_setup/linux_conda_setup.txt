@@ -13,13 +13,16 @@ General Process
 	a. Note issue with GeodisTK and the work around
 8. Configure .wslconfig to maximize Memory and Swap
 	a. Default uses only a portion of RAM
-	b. Increase swap partition size to RAM x1, x2, or x3 probably
+		- Keep it at a level so that the committed memory in Task Manager is below the total amount of RAM. This ensures that Windows Virtual Memory (Windows version of Swap) will not be used and that everything will be kept in RAM and the SSD endurance will not be worn down as much.
+	b. Set Swap size as necessary
+		- Note that Windows already has its own version called Virtual Memory, which is enabled by default.
 	b. create a .wslconfig file in %UserProfile% (C:\Users\dchen)
 	c. Make sure to completely shutdown WSL to implement (run 'wsl --shutdown)
-9. Install htop: sudo apt install htop
-	a. Essentially like Task Manager but for Linux
-10. Set Swappiness: see PDFs
+9. Set Swappiness: see PDFs
 	a. Currently set to 1
+10. Install htop: sudo apt install htop
+	a. Essentially like Task Manager but for Linux
+11. Install iotop: sudo apt install iotop
 
 ***If you get this error: "Invoke-WebRequest : The request was aborted: Could not create SSL/TLS secure channel."
 - Run: [Net.ServicePointManager]::SecurityProtocol = "Tls, Tls11, Tls12, Ssl3"
