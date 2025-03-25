@@ -1,3 +1,4 @@
+from nnunet.training.network_training.nnUNetTrainerV2_ParticleSeg3D_DarrenAdam import nnUNetTrainerV2_ParticleSeg3D_DarrenAdam
 import torch
 from torch.cuda.amp import autocast
 from nnunet.utilities.to_torch import maybe_to_torch, to_cuda
