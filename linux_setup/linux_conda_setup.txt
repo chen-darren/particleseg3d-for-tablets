@@ -13,7 +13,7 @@ General Process
 	a. Note issue with GeodisTK and the work around
 8. Configure .wslconfig to maximize Memory and Swap
 	a. Default uses only a portion of RAM
-		- Keep it at a level so that the committed memory in Task Manager is below the total amount of RAM. This ensures that Windows Virtual Memory (Windows version of Swap) will not be used and that everything will be kept in RAM and the SSD endurance will not be worn down as much.
+		- Keep it at a level so that the committed memory in Task Manager is below the total amount of RAM. This ensures that Windows Virtual Memory (Windows version of Swap) will not be used. This ensures that everything will be kept in RAM and the SSD endurance will not be worn down as much.
 	b. Set Swap size as necessary
 		- Note that Windows already has its own version called Virtual Memory, which is enabled by default.
 	b. create a .wslconfig file in %UserProfile% (C:\Users\dchen)
