@@ -14,7 +14,7 @@ from utils.nnunet_utils import InitWeights_He, Generic_UNet
 
 class Nnunet(pl.LightningModule):
     def __init__(self, model_dir: str, folds: Optional[Tuple[int, int, int, int, int]] = None, nnunet_trainer: str = "nnUNetTrainerV2__nnUNetPlansv2.1", 
-             configuration: str = "3D", tta: bool = True, checkpoint: str = "model_best") -> None:
+             configuration: str = "3D", tta: bool = True, checkpoint: str = "model_final_checkpoint") -> None:
         """
         Initializes the Nnunet class with given parameters and loads the model checkpoint.
 
