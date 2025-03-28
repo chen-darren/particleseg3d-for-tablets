@@ -32,6 +32,7 @@ import multiprocessing
 from pytorch_lightning.strategies import DDPStrategy
 import dask.array as da
 
+# def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
 def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
     Set up the model for inference with multi-GPU support.
