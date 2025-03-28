@@ -155,11 +155,11 @@ def border_core_component2instance_dilation(patch: np.ndarray, core_label: int =
     num_instances = nd_label(patch == core_label, output=core_instances)
     if num_instances == 0:
         return patch
-    patch, core_instances, num_instances = remove_small_cores(patch, core_instances, core_label, border_label)
-    core_instances = np.zeros_like(patch, dtype=np.uint16)
-    num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
-    if num_instances == 0:
-        return patch
+    # patch, core_instances, num_instances = remove_small_cores(patch, core_instances, core_label, border_label)
+    # core_instances = np.zeros_like(patch, dtype=np.uint16)
+    # num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
+    # if num_instances == 0:
+    #     return patch
     instances = copy.deepcopy(core_instances)
     border = patch == border_label
     while np.sum(border) > 0:
