@@ -24,7 +24,8 @@ from skimage import transform as ski_transform
 import tifffile
 import os
 from utils import darren_func as func
-from metrics import particle_size_distribution as part_size_dist
+# from metrics import particle_size_distribution as part_size_dist
+from metrics import particle_size_distribution_v2 as part_size_dist
 from metrics import semantic_metrics as sem_metrics
 from metrics import tiff_to_video
 import torch
