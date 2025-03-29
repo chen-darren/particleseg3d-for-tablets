@@ -595,6 +595,8 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
     
     print("Inference completed successfully!")
 
+    return name
+
 def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', folds=(0, 1, 2, 3, 4), to_binary=False, psd=True, metrics=True):
     # # Using setup_paths function
     # input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
@@ -604,12 +606,13 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
     
     # Using PathMaster class
     pathmaster = func.PathMaster(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
-    names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds)
+    names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds, min_rel_particle_size=None)
     func.convert_zarr_to_tiff(pathmaster.pred_zarr_path, pathmaster.pred_tiff_path, names, to_binary)
+    names = name
     if psd:
         part_size_dist.psd(pathmaster.pred_tiff_path, pathmaster.run_tag, names, pathmaster.psd_path)
     if metrics:
-        sem_metrics.save_metrics(pathmaster.gt_sem_path, pathmaster.gt_inst_path, pathmaster.pred_tiff_path, pathmaster.psd_path, pathmaster.run_tag, names)
+        sem_metrics.save_metrics(pathmaster.gt_sem_path, pathmaster.gt_inst_path, pathmaster.pred_tiff_path, pathmaster.sem_metrics_path, pathmaster.run_tag, names)
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
@@ -627,9 +630,9 @@ if __name__ == "__main__":
 
     # main(dir_location=dir_location, output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_foldsALL', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_fold0', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_fold1', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_fold2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoCoreRemoval_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_foldsALL', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold0', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold1', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=False, is_original_data=False, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
