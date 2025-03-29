@@ -187,7 +187,10 @@ class PathMaster:
         self.base_weights_path = os.path.join(self.base_path, 'weights')
         
         if self.output_to_cloud:
-            self.base_output_path = os.path.join(r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
+            if self.dir_location == 'refine':
+                self.base_output_path = os.path.join(r'D:\Darren\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
+            else:
+                self.base_output_path = os.path.join(r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
         
         self.pred_zarr_path = os.path.join(self.base_output_path, 'zarr', self.run_tag)
         self.pred_tiff_path = os.path.join(self.base_output_path, 'tiff', self.run_tag)
