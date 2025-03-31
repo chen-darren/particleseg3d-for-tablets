@@ -24,8 +24,7 @@ from skimage import transform as ski_transform
 import tifffile
 import os
 from utils import darren_func as func
-# from metrics import particle_size_distribution as part_size_dist
-from metrics import particle_size_distribution_v2 as part_size_dist
+from metrics import particle_size_distribution_v4 as part_size_dist
 from metrics import semantic_metrics as sem_metrics
 import torch
 import multiprocessing
@@ -606,7 +605,7 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
     
     # Using PathMaster class
     pathmaster = func.PathMaster(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
-    names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds, min_rel_particle_size=None)
+    names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds)
     func.convert_zarr_to_tiff(pathmaster.pred_zarr_path, pathmaster.pred_tiff_path, names, to_binary)
     names = name
     if psd:
@@ -619,7 +618,7 @@ if __name__ == "__main__":
     
     # Configurables
     dir_location='refine'
-    output_to_cloud = True
+    output_to_cloud = False
     is_original_data = False
     weights_tag = 'original_particle_seg'
     metadata = 'tab40_gen35_clar35'
@@ -632,9 +631,9 @@ if __name__ == "__main__":
 
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    # main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_foldsALL', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-    # main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold0', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
-    # main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold1', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
-    # main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_NoFiltering_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location='refine', output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
