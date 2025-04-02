@@ -178,7 +178,7 @@ def save_binned_psd(psd_metrics, save_path, num_bins=50, threshold=None):
 
     # Create bins for volume and surface area using logarithmic spacing
     volume_bins = create_bins(volume_min, volume_max, num_bins)
-    surface_area_bins = np.linspace(surface_area_min, surface_area_max, num_bins + 1)
+    surface_area_bins = create_bins(surface_area_min, surface_area_max, num_bins)
     diameter_bins = np.linspace(diameter_min, diameter_max, num_bins + 1)
     sphericity_bins = np.linspace(sphericity_min, sphericity_max, num_bins + 1)
 
@@ -188,7 +188,7 @@ def save_binned_psd(psd_metrics, save_path, num_bins=50, threshold=None):
     sphericity_counts = bin_data(psd_metrics[4], sphericity_bins)
 
     volume_bin_ranges = [f"{v1}.0-{v2}.0" for v1, v2 in zip(volume_bins[:-1], volume_bins[1:])]
-    surface_area_bin_ranges = [f"{s1}-{s2}" for s1, s2 in zip(surface_area_bins[:-1], surface_area_bins[1:])]
+    surface_area_bin_ranges = [f"{s1}.0-{s2}.0" for s1, s2 in zip(surface_area_bins[:-1], surface_area_bins[1:])]
     diameter_bin_ranges = [f"{d1}-{d2}" for d1, d2 in zip(diameter_bins[:-1], diameter_bins[1:])]
     sphericity_bin_ranges = [f"{d1}-{d2}" for d1, d2 in zip(sphericity_bins[:-1], sphericity_bins[1:])]
     
