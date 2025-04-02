@@ -79,7 +79,7 @@ def compute_psd(segmentation):
     if results:
         instance_labels, volumes, surface_areas, diameters, ferets, solidities, sphericities = zip(*results)
     else:
-        instance_labels, volumes, surface_areas, diameters, ferets, solidities, sphericities = ([], [], [], [], [], [])
+        instance_labels, volumes, surface_areas, diameters, ferets, solidities, sphericities = ([], [], [], [], [], [], [])
 
     return [np.array(instance_labels), np.array(volumes), np.array(surface_areas), np.array(diameters), np.array(ferets), np.array(solidities), np.array(sphericities)]
 
