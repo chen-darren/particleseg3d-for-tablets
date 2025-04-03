@@ -25,15 +25,3 @@ class nnUNetTrainerV2_ParticleSeg3D_DarrenAdam(nnUNetTrainerV2_ParticleSeg3D):
                                                            patience=self.lr_scheduler_patience,
                                                            verbose=True, threshold=self.lr_scheduler_eps,
                                                            threshold_mode="abs")
-        
-    def maybe_update_lr(self, epochs=None):
-        # maybe update learning rate
-        if self.lr_scheduler is not None:
-            assert isinstance(self.lr_scheduler, (lr_scheduler.ReduceLROnPlateau, lr_scheduler._LRScheduler))
-
-            if isinstance(self.lr_scheduler, lr_scheduler.ReduceLROnPlateau):
-                # lr scheduler is updated with moving average val loss. should be more robust
-                self.lr_scheduler.step(self.train_loss_MA)
-            else:
-                self.lr_scheduler.step(self.epoch + 1)
-        self.print_to_log_file("lr is now (scheduler) %s" % str(self.optimizer.param_groups[0]['lr']))
