@@ -69,8 +69,7 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
             border_core_patch[filter_mask != 1] = 0
             border_core_patches.append(border_core_patch)
 
-        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, 
-                                  desc="Border-Core2Instance", disable=not progressbar)
+        instances_patches = ptqdm(border_core_component2instance, border_core_patches, processes, desc="Border-Core2Instance", disable=not progressbar)
 
         for index, (label, bbox) in enumerate(tqdm(props.items())):
             instances_patch = instances_patches[index].astype(dtype)
