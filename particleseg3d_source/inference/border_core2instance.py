@@ -33,7 +33,8 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
     """
 
     border_core_array = np.array(border_core)
-    component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype)
+    component_seg = cc3d.connected_components(border_core_array > 0)
+    component_seg = component_seg.astype(dtype)
     instances = np.zeros_like(border_core, dtype=dtype)
     num_instances = 0
     props = {i: bbox for i, bbox in enumerate(cc3d.statistics(component_seg)["bounding_boxes"]) if i != 0}
