@@ -24,7 +24,7 @@ from skimage import transform as ski_transform
 import tifffile
 import os
 from utils import darren_func as func
-from metrics import particle_size_distribution_v2 as part_size_dist
+from metrics import particle_size_distribution_v6 as part_size_dist
 from metrics import semantic_metrics as sem_metrics
 import torch
 import multiprocessing
@@ -620,18 +620,19 @@ if __name__ == "__main__":
     output_to_cloud = False
     is_original_data = False
     weights_tag = 'original_particle_seg'
-    metadata = 'tab40_gen35_clar35'
+    # metadata = 'tab40_gen35_clar35'
+    metadata = 'pretrained_tab100'
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
     to_binary = False
-    psd = True
-    metrics = True
+    psd = False
+    metrics = False
 
-    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc2', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc_current', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_foldsALL_v3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold0_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold0_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold1', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold3', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
