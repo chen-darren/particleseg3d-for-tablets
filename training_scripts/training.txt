@@ -2,17 +2,17 @@ nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D ### fold --npz --disable_p
 
 ================================================================================================================================
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 502 2 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D 502 3 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 2 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 3 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip 502 2 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip 502 3 --npz --disable_postprocessing_on_folds -pretrained_weights /home/dchen/Senior_Design/weights/original_particle_seg/nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1/fold_0/model_best.model
 
 ================================================================================================================================
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 2 --npz --disable_postprocessing_on_fold -c
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD 502 3 --npz --disable_postprocessing_on_fold -c
 
-nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip 502 0 --npz --disable_postprocessing_on_fold -c
+nnUNet_train 3d_fullres nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip 502 3 --npz --disable_postprocessing_on_fold -c
 
 ================================================================================================================================
 
