@@ -606,6 +606,7 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
     # Using PathMaster class
     pathmaster = func.PathMaster(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
     names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds)
+    # names = name
     func.convert_zarr_to_tiff(pathmaster.pred_zarr_path, pathmaster.pred_tiff_path, names, to_binary)
     if psd:
         part_size_dist.psd(pathmaster.pred_tiff_path, pathmaster.run_tag, names, pathmaster.psd_path)
@@ -633,7 +634,9 @@ if __name__ == "__main__":
 
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_foldsALL_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold0_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold1_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold2_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold3_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold1_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold2_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold3_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4_v2', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
+
+    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_tab40_gen35_clar35_fold4_v2', metadata=metadata, name=['4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
