@@ -349,8 +349,8 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
                     title = f"{psd_metric_name}"
                 else:
                     title = f"{psd_metric_name} (voxels)"
-                save_histogram(raw_psd_metric, raw_psd_bin, f"Raw Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_raw_{psd_metric_tag}_hist.png"))
-                save_histogram(raw_psd_metric, raw_psd_bin, f"Raw Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_raw_{psd_metric_tag}_percentvol_hist.png"), raw_psd_percent_weights, 'Percent Volume (%)')
+                save_histogram(raw_psd_metric, raw_psd_bin, f"Raw Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_raw_{psd_metric_tag}_hist.png"))
+                save_histogram(raw_psd_metric, raw_psd_bin, f"Raw Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_raw_{psd_metric_tag}_percentvol_hist.png"), raw_psd_percent_weights, 'Percent Volume (%)')
                 
             # IQR-filterd PSD values
             if not (len(iqr_filt_psd_metrics) - 1 == len(iqr_filt_psd_bins) == len(psd_metric_names) == len(psd_metric_tags)):
@@ -361,8 +361,8 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
                     title = f"{psd_metric_name}"
                 else:
                     title = f"{psd_metric_name} (voxels)"
-                save_histogram(iqr_filt_psd_metric, iqr_filt_psd_bin, f"IQR-Filtered Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_iqr_filt_{psd_metric_tag}_hist.png"))
-                save_histogram(iqr_filt_psd_metric, iqr_filt_psd_bin, f"IQR-Filtered Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_iqr_filt_{psd_metric_tag}_percentvol_hist.png"), iqr_filt_psd_percent_weights, 'Percent Volume (%)')
+                save_histogram(iqr_filt_psd_metric, iqr_filt_psd_bin, f"IQR-Filtered Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_iqr_filt_{psd_metric_tag}_hist.png"))
+                save_histogram(iqr_filt_psd_metric, iqr_filt_psd_bin, f"IQR-Filtered Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_iqr_filt_{psd_metric_tag}_percentvol_hist.png"), iqr_filt_psd_percent_weights, 'Percent Volume (%)')
 
             # Threshold-filterd PSD values
             if not (len(thresh_filt_psd_metrics) - 1 == len(thresh_filt_psd_bins) == len(psd_metric_names) == len(psd_metric_tags)):
@@ -373,8 +373,8 @@ def psd(input_dir, run_tag, names, save_dir, save=True):
                     title = f"{psd_metric_name}"
                 else:
                     title = f"{psd_metric_name} (voxels)"
-                save_histogram(thresh_filt_psd_metric, thresh_filt_psd_bin, f"Threshold-Filtered Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_thresh_filt_{psd_metric_tag}_hist.png"))
-                save_histogram(thresh_filt_psd_metric, thresh_filt_psd_bin, f"Threshold-Filtered Particle {psd_metric_name} Distribution", title, os.path.join(hist_folder, f"{name}_thresh_filt_{psd_metric_tag}_percentvol_hist.png"), thresh_filt_psd_percent_weights, 'Percent Volume (%)')
+                save_histogram(thresh_filt_psd_metric, thresh_filt_psd_bin, f"Threshold-Filtered Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_thresh_filt_{psd_metric_tag}_hist.png"))
+                save_histogram(thresh_filt_psd_metric, thresh_filt_psd_bin, f"Threshold-Filtered Particle {psd_metric_name} Distribution of {name}", title, os.path.join(hist_folder, f"{name}_thresh_filt_{psd_metric_tag}_percentvol_hist.png"), thresh_filt_psd_percent_weights, 'Percent Volume (%)')
 
             # Save summary metrics
             lists_of_psd_metrics = [raw_psd_metrics, iqr_filt_psd_metrics, thresh_filt_psd_metrics]
