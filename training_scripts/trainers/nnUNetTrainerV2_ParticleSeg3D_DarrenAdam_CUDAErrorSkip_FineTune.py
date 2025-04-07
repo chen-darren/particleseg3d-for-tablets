@@ -8,4 +8,4 @@ class nnUNetTrainerV2_ParticleSeg3D_DarrenAdam_CUDAErrorSkip_FineTune(nnUNetTrai
         
         # Revised max epochs and initial learning rate for fine tuning
         self.max_num_epochs = 500 # 1/2 the max number of epochs of nnUNetTrainerV2_ParticleSeg3D_DarrenAdam_CUDAErrorSkip
-        self.inital_lr = 3e-6 # 1/10 the initial learnging rate of nnUNetTrainerV2_ParticleSeg3D_DarrenAdam_CUDAErrorSkip
+        self.initial_lr = 3e-6 # 1/10 the initial learnging rate of nnUNetTrainerV2_ParticleSeg3D_DarrenAdam_CUDAErrorSkip
