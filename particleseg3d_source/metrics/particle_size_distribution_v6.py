@@ -72,7 +72,7 @@ def filter_by_iqr(raw_psd_metrics, threshold_factor=7.5):
     mask = (raw_psd_metrics[1] >= lower_bound) & (raw_psd_metrics[1] <= upper_bound)
     return [raw_psd_metrics[0][mask], raw_psd_metrics[1][mask], raw_psd_metrics[2][mask], raw_psd_metrics[3][mask], raw_psd_metrics[4][mask]]
 
-def filter_by_threshold(raw_psd_metrics, threshold=('diameter', 50)):
+def filter_by_threshold(raw_psd_metrics, threshold=('volume', 10000)):
     """Filter particles based on a specified threshold for various metrics."""
     # Apply the appropriate threshold based on the specified metric
     if threshold[0] == 'volume':
