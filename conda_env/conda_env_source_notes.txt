@@ -5,11 +5,12 @@ Things Needed
 	- pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
 - PyTorch with CUDA
 	- For multi-gpu, need libuv (v2.3.0) 
-- Numpy version 1.24.3 or 1.26.4 (or any <2)
-	- Automatically installed with PyTorch
-	- If installed before PyTorch, GPUs will not be detected
-	- Note that for new pickle files (i.e. from nnU-Net training), version 1.26.4 (or greater but < 2) is needed
-		- conda install numpy=1.26.4
+- Numpy version 1.26.4
+	- PyTorch installs numpy as version 1.24.3
+		- If installed before PyTorch, GPUs will not be detected
+	- Note that for new pickle files (i.e. from nnU-Net training), version 1.26.4 (or greater but < 2) is needed, otherwise it results in a numpy core error
+	- Must use pip or there is some sort of error with dll
+		- pip install numpy==1.26.4
 - P-Tqdm
 	- For tqdm of parallel processes
 	- conda install conda-forge::p-tqdm
@@ -36,7 +37,7 @@ To Set-Up on REFINE: copy and paste
 conda create -n Senior_Design_py310_source python=3.10
 conda activate Senior_Design_py310_source
 conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-conda install numpy=1.26.4
+pip install numpy==1.26.4
 conda install conda-forge::p-tqdm
 conda install conda-forge::pretty_errors
 pip install ParticleSeg3D
@@ -54,7 +55,7 @@ conda create -n Senior_Design_py310_source python=3.10
 conda activate Senior_Design_py310_source
 conda install -n Senior_Design_py310_source conda-forge::mamba
 mamba install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-mamba install numpy=1.26.4
+pip install numpy==1.26.4
 mamba install conda-forge::p-tqdm
 mamba install conda-forge::pretty_errors
 pip install ParticleSeg3D
@@ -72,7 +73,7 @@ conda create -n Senior_Design_py310_source python=3.10
 conda activate Senior_Design_py310_source
 conda install -n Senior_Design_py310_source conda-forge::mamba
 mamba install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-mamba install numpy=1.26.4
+pip install numpy==1.26.4
 mamba install conda-forge::p-tqdm
 mamba install conda-forge::pretty_errors
 ## First time install =================================
@@ -94,7 +95,7 @@ FOR LINUX Just for Training and Preprocessing (No Mamba):
 conda create -n Senior_Design_py310_source python=3.10
 conda activate Senior_Design_py310_source
 conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
-conda install numpy=1.26.4
+pip install numpy==1.26.4
 ## First time install =================================
 # sudo apt update
 # sudo apt install cmake build-essential python3-dev
