@@ -33,7 +33,7 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
     """
 
     border_core_array = np.array(border_core)
-    # component_seg = cc3d.connected_components(border_core_array > 0, connectivity=6).astype(dtype)
+    # component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype) # Original method
     component_seg = cc3d.connected_components(border_core_array, binary_image=True, connectivity=6).astype(dtype)
     instances = np.zeros_like(border_core, dtype=dtype)
     num_instances = 0
