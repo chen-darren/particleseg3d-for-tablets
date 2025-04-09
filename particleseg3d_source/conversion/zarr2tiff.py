@@ -31,7 +31,7 @@ def main():
     parser.add_argument('-o', "--output", required=True, help="Absolute output path to the folder that should be used to save the TIFF image slices.")
     args = parser.parse_args()
 
-    zarr2tiff(args.input, args.output)
+    zarr2tiff(r'd:\Darren\Files\outputs\zarr\temp\4_GenericD12\4_GenericD12_border.zarr', r'd:\Darren\Files\outputs\zarr\temp\4_GenericD12\4_GenericD12_border')
 
 
 if __name__ == '__main__':

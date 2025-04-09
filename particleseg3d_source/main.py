@@ -623,6 +623,7 @@ if __name__ == "__main__":
     # weights_tag = 'Pretrained_ParticleSeg3D'
     weights_tag = 'Task502_Manual_Split_TL_Fold0'
     metadata = 'tab40_gen35_clar35'
+    names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
@@ -630,11 +631,17 @@ if __name__ == "__main__":
     psd = True
     metrics = True
 
-    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc_current', metadata=metadata, name=['2_Tablet'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc_current', metadata=metadata, name=[names[1]], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_foldsALL_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold0_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
-    main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4_6con', metadata=metadata, name=['2_Tablet', '4_GenericD12', '5_ClaritinD12'], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names[1:]:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_foldsALL', metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold0', metadata=metadata, name=[name], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1', metadata=metadata, name=[name], strategy=strategy, folds=[1], to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2', metadata=metadata, name=[name], strategy=strategy, folds=[2], to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3', metadata=metadata, name=[name], strategy=strategy, folds=[3], to_binary=to_binary, psd=psd, metrics=metrics)
+    for name in names:
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4', metadata=metadata, name=[name], strategy=strategy, folds=[4], to_binary=to_binary, psd=psd, metrics=metrics)

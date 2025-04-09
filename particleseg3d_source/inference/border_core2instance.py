@@ -33,8 +33,8 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
     """
 
     border_core_array = np.array(border_core)
-    # component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype) # Original method
-    component_seg = cc3d.connected_components(border_core_array, binary_image=True, connectivity=6).astype(dtype)
+    component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype) # Original method
+    # component_seg = cc3d.connected_components(border_core_array, binary_image=True, connectivity=6).astype(dtype) # Seems to result in the same number and size of instances as the original (the labels may be a bit different due to different connected components). Comparing semantic segmentation results shows differences in the scale of 1e-5.
     instances = np.zeros_like(border_core, dtype=dtype)
     num_instances = 0
     props = {i: bbox for i, bbox in enumerate(cc3d.statistics(component_seg)["bounding_boxes"]) if i != 0}
