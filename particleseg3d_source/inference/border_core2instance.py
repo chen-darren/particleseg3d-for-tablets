@@ -33,8 +33,8 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
     """
 
     border_core_array = np.array(border_core)
-    component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype) # Original method
-    # component_seg = cc3d.connected_components(border_core_array, binary_image=True, connectivity=6).astype(dtype) # Seems to result in the same number and size of instances as the original (the labels may be a bit different due to different connected components). Comparing semantic segmentation results shows differences in the scale of 1e-5.
+    # component_seg = cc3d.connected_components(border_core_array > 0).astype(dtype) # Original method
+    component_seg = cc3d.connected_components(border_core_array > 0, connectivity=6).astype(dtype) # Seems to result in the same number and size of instances as the original (the labels may be a bit different due to different connected components). Comparing semantic segmentation results shows differences in the scale of 1e-5.
     instances = np.zeros_like(border_core, dtype=dtype)
     num_instances = 0
     props = {i: bbox for i, bbox in enumerate(cc3d.statistics(component_seg)["bounding_boxes"]) if i != 0}
@@ -135,13 +135,17 @@ def border_core_component2instance_dilation(patch: np.ndarray, core_label: int =
     :param border_label: The border label.
     :return: The instance segmentation of this connected component patch.
     """
-    core_instances = np.zeros_like(patch, dtype=np.uint16)
-    num_instances = nd_label(patch == core_label, output=core_instances)
+    # core_instances = np.zeros_like(patch, dtype=np.uint16)
+    # num_instances = nd_label(patch == core_label, output=core_instances)
+    core_instances = cc3d.connected_components(patch == core_label, connectivity=6) # cc3d.connected_components is better optimized than scipy.ndimage.label
+    num_instances = core_instances.max()
     if num_instances == 0:
         return patch
     # patch, core_instances, num_instances = remove_small_cores(patch, core_instances, core_label, border_label)
-    # core_instances = np.zeros_like(patch, dtype=np.uint16)
-    # num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
+    # # core_instances = np.zeros_like(patch, dtype=np.uint16)
+    # # num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
+    # core_instances = cc3d.connected_components(patch == core_label, connectivity=6) # cc3d.connected_components is better optimized than scipy.ndimage.label
+    # num_instances = core_instances.max()
     # if num_instances == 0:
     #     return patch
     instances = copy.deepcopy(core_instances)
