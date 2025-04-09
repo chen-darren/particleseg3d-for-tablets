@@ -51,7 +51,7 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
     border_core_component2instance = border_core_component2instance_dilation
 
     if processes is None or processes == 0:
-        for index, (label, bbox) in enumerate(tqdm(props.items(), desc="Border-Core2Instance", disable=not progressbar)):
+        for label, bbox in tqdm(props.items(), desc="Border-Core2Instance", disable=not progressbar):
             filter_mask = component_seg[bbox] == label
             border_core_patch = copy.deepcopy(border_core[bbox])
             border_core_patch[filter_mask != 1] = 0
@@ -64,7 +64,7 @@ def border_core2instance(border_core: np.ndarray, pred_border_core_tmp_filepath:
                 instances[bbox][instances_patch == patch_label] = patch_label
     else:
         border_core_patches = []
-        for index, (label, bbox) in enumerate(props.items()):
+        for label, bbox in props.items():
             filter_mask = component_seg[bbox] == label
             border_core_patch = copy.deepcopy(border_core[bbox])
             border_core_patch[filter_mask != 1] = 0

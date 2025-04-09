@@ -289,7 +289,7 @@ def predict( # Original
     border_core_resized_pred = aggregator.get_output()
     shutil.rmtree(pred_softmax_filepath, ignore_errors=True)
 
-    instance_pred = border_core2instance_conversion(border_core_resized_pred, pred_border_core_tmp_filepath, crop_slices, img.shape, source_spacing, pred_instance_filepath, processes=processes)
+    instance_pred = border_core2instance_conversion(border_core_resized_pred, pred_border_core_tmp_filepath, crop_slices, img.shape, source_spacing, pred_instance_filepath) # Seems to run faster without parallel processing
     instance_pred = filter_small_particles(instance_pred, min_rel_particle_size)
     save_prediction(instance_pred, pred_instance_filepath, source_spacing)
 
