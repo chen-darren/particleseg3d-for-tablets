@@ -144,13 +144,14 @@ def border_core_component2instance_dilation(patch: np.ndarray, core_label: int =
     if num_instances == 0:
         return patch
     
-    patch, core_instances, num_instances = remove_small_cores(patch, core_instances, core_label, border_label)
-    # core_instances = np.zeros_like(patch, dtype=np.uint16)
-    # num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
-    core_instances = cc3d.connected_components(patch == core_label, connectivity=6) # cc3d.connected_components is better optimized than scipy.ndimage.label
-    num_instances = core_instances.max()
-    if num_instances == 0:
-        return patch
+    # # Significiant bottleneck when patch size is big and has many particles in it (same reason as for the for loop that iterates through the patch labels)
+    # patch, core_instances, num_instances = remove_small_cores(patch, core_instances, core_label, border_label)
+    # # core_instances = np.zeros_like(patch, dtype=np.uint16)
+    # # num_instances = nd_label(patch == core_label, output=core_instances)  # remove_small_cores invalidates the previous core_instances, so recompute it. The computation time is neglectable.
+    # core_instances = cc3d.connected_components(patch == core_label, connectivity=6) # cc3d.connected_components is better optimized than scipy.ndimage.label
+    # num_instances = core_instances.max()
+    # if num_instances == 0:
+    #     return patch
     
     instances = copy.deepcopy(core_instances)
     border = patch == border_label
