@@ -623,7 +623,7 @@ if __name__ == "__main__":
     # weights_tag = 'Pretrained_ParticleSeg3D'
     weights_tag = 'Task502_Manual_Split_TL_Fold0'
     metadata = 'tab40_gen35_clar35'
-    names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
+    names = ['2_Tablet', '4_GenericD12']
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
@@ -633,10 +633,14 @@ if __name__ == "__main__":
 
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc_current', metadata=metadata, name=[names[1]], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_foldsALL_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold0_acc', 
-                'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2_acc',
-                'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4_acc']
-    folds_per_run = [None, [0], [1], [2], [3], [4]]
+    # run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_foldsALL_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold0_acc', 
+    #             'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2_acc',
+    #             'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4_acc']
+    # folds_per_run = [None, [0], [1], [2], [3], [4]]
+
+    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_folds03_acc']
+    folds_per_run = [[0, 3]]
+
     for name in names:
         for run_tag, folds in zip(run_tags, folds_per_run):
             if folds is None:
