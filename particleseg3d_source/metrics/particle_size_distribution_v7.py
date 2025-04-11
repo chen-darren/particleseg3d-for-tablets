@@ -353,7 +353,11 @@ def save_comparison(name, gt_path, pred_path, table_type, title, save_dir):
         # plt.scatter(gt_centers, gt_vals, color='blue', s=15)
         # plt.scatter(pred_centers, pred_vals, color='red', s=15)
 
-        plt.xlabel(metric)
+        if metric == 'Sphericity':
+            plt.xlabel(metric)
+        else:
+            plt.xlabel(metric + ' (voxels)')
+
         plt.ylabel('Percent Volume (%)')
         plt.title(title.replace('*placeholder*', metric))
         plt.legend()
