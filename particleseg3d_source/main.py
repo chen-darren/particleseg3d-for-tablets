@@ -655,3 +655,11 @@ if __name__ == "__main__":
                 main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
             else:
                 main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
+
+    run_tags = ['task502_manual_split_tl_fold0_clar30_fold0_acc', 'task502_manual_split_tl_fold0_clar40_fold0_acc',
+                'task502_manual_split_tl_fold0_clar45_fold0_acc', 'task502_manual_split_tl_fold0_clar50_fold0_acc']
+    metadatas = ['gen30_clar30', 'gen40_clar40', 'gen45_clar45', 'gen50_clar50']
+
+    for metadata in metadatas:
+        for run_tag in run_tags:
+            main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=psd, metrics=metrics)
