@@ -200,7 +200,7 @@ class PathMaster:
         self.weights_path = os.path.join(self.base_weights_path, self.weights_tag)
         
         # PSD Paths
-        self.psd_path = os.path.join(self.base_output_path, 'metrics', 'particle_size_dist_v6')
+        self.psd_path = os.path.join(self.base_output_path, 'metrics', 'particle_size_dist_v7')
         
         # Ground Truth Paths
         self.gt_sem_path = os.path.join(self.base_database_path, dataset_type, 'binary', 'tiff')
