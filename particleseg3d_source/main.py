@@ -645,7 +645,7 @@ if __name__ == "__main__":
     #         else:
     #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
+    names = ['4_GenericD12', '5_ClaritinD12']
     run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_folds03_3tta_acc']
     folds_per_run = [[0, 3]]
 
