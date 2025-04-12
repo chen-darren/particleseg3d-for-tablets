@@ -623,7 +623,7 @@ if __name__ == "__main__":
     # weights_tag = 'Pretrained_ParticleSeg3D'
     weights_tag = 'Task502_Manual_Split_TL_Fold0'
     metadata = 'tab40_gen35_clar35'
-    # names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
+    names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
     strategy='dp'
     # strategy='ddp' # Model does not detect anything when using DDP
     # strategy='singleGPU'
@@ -633,20 +633,20 @@ if __name__ == "__main__":
 
     # main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag='pretrained_misc_current', metadata=metadata, name=[names[1]], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    names = ['5_ClaritinD12']
-    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2_acc',
-                'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4_acc']
-    folds_per_run = [[1], [2], [3], [4]]
+    # names = ['5_ClaritinD12']
+    # run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_fold1_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold2_acc',
+    #             'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold3_acc', 'task502_manual_split_tl_fold0_tab40_gen35_clar35_fold4_acc']
+    # folds_per_run = [[1], [2], [3], [4]]
 
-    for name in names:
-        for run_tag, folds in zip(run_tags, folds_per_run):
-            if folds is None:
-                main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-            else:
-                main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
+    # for name in names:
+    #     for run_tag, folds in zip(run_tags, folds_per_run):
+    #         if folds is None:
+    #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    #         else:
+    #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
     names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
-    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_folds03_acc']
+    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_folds03_3tta_acc']
     folds_per_run = [[0, 3]]
 
     for name in names:
@@ -656,10 +656,8 @@ if __name__ == "__main__":
             else:
                 main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    run_tags = ['task502_manual_split_tl_fold0_clar30_folds03_acc', 'task502_manual_split_tl_fold0_clar40_folds03_acc',
-                'task502_manual_split_tl_fold0_clar45_folds03_acc', 'task502_manual_split_tl_fold0_clar50_folds03_acc']
-    metadatas = ['gen30_clar30', 'gen40_clar40', 'gen45_clar45', 'gen50_clar50']
+    # run_tags = ['task502_manual_split_tl_fold0_clar40_folds03_acc', 'task502_manual_split_tl_fold0_clar45_folds03_acc', 'task502_manual_split_tl_fold0_clar50_folds03_acc']
+    # metadatas = ['gen40_clar40', 'gen45_clar45', 'gen50_clar50']
 
-    for metadata in metadatas:
-        for run_tag in run_tags:
-            main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0, 3], to_binary=to_binary, psd=psd, metrics=metrics)
+    # for metadata, run_tag in zip(metadatas, run_tags):
+    #     main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0, 3], to_binary=to_binary, psd=psd, metrics=metrics)
