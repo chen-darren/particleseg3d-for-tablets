@@ -31,8 +31,8 @@ import multiprocessing
 from pytorch_lightning.strategies import DDPStrategy
 import dask.array as da
 
-# def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
-def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
+def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_slimDA5_touchV5__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
+# def setup_model(model_dir: str, folds: List[int], strategy: str = 'singleGPU', trainer: str = "nnUNetTrainerV2_ParticleSeg3D_DarrenSGD_CUDAErrorSkip__nnUNetPlansv2.1") -> Tuple[pl.Trainer, Nnunet, Dict[str, Any]]:
     """
     Set up the model for inference with multi-GPU support.
 
@@ -645,19 +645,19 @@ if __name__ == "__main__":
     #         else:
     #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    names = ['4_GenericD12', '5_ClaritinD12']
-    run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_folds03_3tta_acc']
-    folds_per_run = [[0, 3]]
+    # names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
+    # run_tags = ['task502_manual_split_tl_fold0_tab40_gen35_clar35_folds03_3tta_acc']
+    # folds_per_run = [[0, 3]]
 
-    for name in names:
-        for run_tag, folds in zip(run_tags, folds_per_run):
-            if folds is None:
-                main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
-            else:
-                main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
+    # for name in names:
+    #     for run_tag, folds in zip(run_tags, folds_per_run):
+    #         if folds is None:
+    #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, to_binary=to_binary, psd=psd, metrics=metrics)
+    #         else:
+    #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    # run_tags = ['task502_manual_split_tl_fold0_clar40_folds03_acc', 'task502_manual_split_tl_fold0_clar45_folds03_acc', 'task502_manual_split_tl_fold0_clar50_folds03_acc']
-    # metadatas = ['gen40_clar40', 'gen45_clar45', 'gen50_clar50']
+    run_tags = ['aaa']
+    metadatas = ['tab40_gen35_clar35']
 
-    # for metadata, run_tag in zip(metadatas, run_tags):
-    #     main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0, 3], to_binary=to_binary, psd=psd, metrics=metrics)
+    for metadata, run_tag in zip(metadatas, run_tags):
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag='Pretrained_ParticleSeg3D', run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=False, metrics=False)
