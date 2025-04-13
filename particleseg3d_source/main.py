@@ -670,11 +670,11 @@ if __name__ == "__main__":
     #         else:
     #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    metadatas = ['tab35', 'tab30', 'tab25']
-    run_tags = ['task502_manual_split_tl_fold0_tab35_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab30_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab25_folds03_3tta_acc']
+    # metadatas = ['tab35', 'tab30', 'tab25']
+    # run_tags = ['task502_manual_split_tl_fold0_tab35_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab30_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab25_folds03_3tta_acc']
 
-    for metadata, run_tag in zip(metadatas, run_tags):
-        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['2_Tablet'], strategy=strategy, folds=[0,3], to_binary=to_binary, psd=psd, metrics=metrics)
+    # for metadata, run_tag in zip(metadatas, run_tags):
+    #     main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['2_Tablet'], strategy=strategy, folds=[0,3], to_binary=to_binary, psd=psd, metrics=metrics)
 
     metadatas = ['gen30', 'gen25']
     run_tags = ['task502_manual_split_tl_fold0_gen30_folds03_3tta_acc', 'task502_manual_split_tl_fold0_gen25_folds03_3tta_acc']
