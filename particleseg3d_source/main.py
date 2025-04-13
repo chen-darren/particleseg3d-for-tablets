@@ -289,22 +289,23 @@ def predict( # Original
     border_core_resized_pred = aggregator.get_output()
     shutil.rmtree(pred_softmax_filepath, ignore_errors=True)
 
-    output_dir = r'D:\Darren\Files\outputs\bordercore\bbb\5_ClaritinD12'
-    os.makedirs(output_dir, exist_ok=True)
+    # # For saving border-core to a specific directory
+    # output_dir = r'D:\Darren\Files\outputs\bordercore\bbb\5_ClaritinD12'
+    # os.makedirs(output_dir, exist_ok=True)
 
-    for i in range(border_core_resized_pred.shape[0]):
-        slice_2d = border_core_resized_pred[i]
+    # for i in range(border_core_resized_pred.shape[0]):
+    #     slice_2d = border_core_resized_pred[i]
         
-        # Map values: 1 -> 255, 2 -> 127, else -> 0
-        mapped_slice = np.zeros_like(slice_2d, dtype=np.uint8)
-        mapped_slice[slice_2d == 1] = 255
-        mapped_slice[slice_2d == 2] = 127
+    #     # Map values: 1 -> 255, 2 -> 127, else -> 0
+    #     mapped_slice = np.zeros_like(slice_2d, dtype=np.uint8)
+    #     mapped_slice[slice_2d == 1] = 255
+    #     mapped_slice[slice_2d == 2] = 127
 
-        tifffile.imwrite(os.path.join(output_dir, f'slice_{i:03d}.tiff'), mapped_slice)
+    #     tifffile.imwrite(os.path.join(output_dir, f'slice_{i:03d}.tiff'), mapped_slice)
 
-    # instance_pred = border_core2instance_conversion(border_core_resized_pred, pred_border_core_tmp_filepath, crop_slices, img.shape, source_spacing, pred_instance_filepath) # Seems to run faster without parallel processing
-    # instance_pred = filter_small_particles(instance_pred, min_rel_particle_size)
-    # save_prediction(instance_pred, pred_instance_filepath, source_spacing)
+    instance_pred = border_core2instance_conversion(border_core_resized_pred, pred_border_core_tmp_filepath, crop_slices, img.shape, source_spacing, pred_instance_filepath) # Seems to run faster without parallel processing
+    instance_pred = filter_small_particles(instance_pred, min_rel_particle_size)
+    save_prediction(instance_pred, pred_instance_filepath, source_spacing)
 
     shutil.rmtree(pred_border_core_filepath, ignore_errors=True)
     shutil.rmtree(pred_border_core_tmp_filepath, ignore_errors=True)
@@ -619,12 +620,12 @@ def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='
     # Using PathMaster class
     pathmaster = func.PathMaster(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
     names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds)
-    # # names = name
-    # func.convert_zarr_to_tiff(pathmaster.pred_zarr_path, pathmaster.pred_tiff_path, names, to_binary)
-    # if psd:
-    #     part_size_dist.psd(pathmaster.pred_tiff_path, pathmaster.run_tag, names, pathmaster.psd_path)
-    # if metrics:
-    #     sem_metrics.save_metrics(pathmaster.gt_sem_path, pathmaster.gt_inst_path, pathmaster.pred_tiff_path, pathmaster.sem_metrics_path, pathmaster.run_tag, names)
+    # names = name
+    func.convert_zarr_to_tiff(pathmaster.pred_zarr_path, pathmaster.pred_tiff_path, names, to_binary)
+    if psd:
+        part_size_dist.psd(pathmaster.pred_tiff_path, pathmaster.run_tag, names, pathmaster.psd_path)
+    if metrics:
+        sem_metrics.save_metrics(pathmaster.gt_sem_path, pathmaster.gt_inst_path, pathmaster.pred_tiff_path, pathmaster.sem_metrics_path, pathmaster.run_tag, names)
 
 if __name__ == "__main__":
     multiprocessing.set_start_method('spawn', force=True)
@@ -669,8 +670,15 @@ if __name__ == "__main__":
     #         else:
     #             main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=[name], strategy=strategy, folds=folds, to_binary=to_binary, psd=psd, metrics=metrics)
 
-    run_tags = ['bbb']
-    metadatas = ['tab40_gen35_clar35']
+    metadatas = ['tab35', 'tab30', 'tab25', 'tab20']
+    run_tags = ['task502_manual_split_tl_fold0_tab35_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab30_folds03_3tta_acc', 
+                'task502_manual_split_tl_fold0_tab25_folds03_3tta_acc', 'task502_manual_split_tl_fold0_tab20_folds03_3tta_acc']
 
     for metadata, run_tag in zip(metadatas, run_tags):
-        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['5_ClaritinD12'], strategy=strategy, folds=[0], to_binary=to_binary, psd=False, metrics=False)
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['2_Tablet'], strategy=strategy, folds=[0,3], to_binary=to_binary, psd=psd, metrics=metrics)
+
+    metadatas = ['gen30', 'gen25']
+    run_tags = ['task502_manual_split_tl_fold0_gen30_folds03_3tta_acc', 'task502_manual_split_tl_fold0_gen25_folds03_3tta_acc']
+
+    for metadata, run_tag in zip(metadatas, run_tags):
+        main(dir_location=dir_location, output_to_cloud=output_to_cloud, is_original_data=is_original_data, weights_tag=weights_tag, run_tag=run_tag, metadata=metadata, name=['4_GenericD12'], strategy=strategy, folds=[0,3], to_binary=to_binary, psd=psd, metrics=metrics)
