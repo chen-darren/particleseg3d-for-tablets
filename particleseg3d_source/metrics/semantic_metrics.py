@@ -33,7 +33,7 @@ def process_image(img, gt_sem_path, gt_inst_path, pred_path, run_tag):
     # gt_inst_image = np.stack([tiff.imread(os.path.join(gt_inst_path, img, f)) for f in gt_inst_files])
     pred_image = np.stack([tiff.imread(os.path.join(pred_path, img, f)) for f in pred_files])
     
-    gt_sem_mask = gt_sem_image == 255
+    gt_sem_mask = gt_sem_image > 0
     pred_sem_mask = pred_image > 0
     
     iou, dice, accuracy, precision, recall, specificity, fpr, fnr = calculate_metrics(gt_sem_mask, pred_sem_mask)
