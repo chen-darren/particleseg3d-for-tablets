@@ -1,0 +1,106 @@
+Things Needed
+- ParticleSeg3D
+	- Need Visual Studio Build Tools to install ParticleSeg3D
+	- pip install ParticleSeg3D
+	- pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
+- PyTorch with CUDA
+	- For multi-gpu, need libuv (v2.3.0) 
+- Numpy version 1.26.4
+	- PyTorch installs numpy as version 1.24.3
+		- If installed before PyTorch, GPUs will not be detected
+	- Note that for new pickle files (i.e. from nnU-Net training), version 1.26.4 (or greater but < 2) is needed, otherwise it results in a numpy core error
+	- Must use pip or there is some sort of error with dll
+		- pip install numpy==1.26.4
+- P-Tqdm
+	- For tqdm of parallel processes
+	- conda install conda-forge::p-tqdm
+- Pretty Errors
+	- conda install conda-forge::pretty_errors
+- Python
+	- Use version 3.10
+- For Jupyter
+	- conda install ipykernel
+- For TIFF viewer
+	- pip install "napari[all]"
+- For TIFF to Video
+	pip install imageio[ffmpeg]
+- For showing images from ratio_detected.ipynb
+- For semantic to instance
+	- pip3 install opencv-python
+	- pip install imagecodecs
+		- Be sure to disconnect and reconnect kernel
+
+**Does not import correctly from YAML
+**When copying and pasting, remember to delete the directory in C:\Users\name\anaconda3\envs
+
+To Set-Up on REFINE: copy and paste
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
+conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install numpy==1.26.4
+conda install conda-forge::p-tqdm
+conda install conda-forge::pretty_errors
+pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
+conda install ipykernel
+pip install "napari[all]"
+pip install imageio[ffmpeg]
+conda install conda-forge::matplotlib
+pip3 install opencv-python
+pip install imagecodecs
+
+
+To Set-Up on REFINE and use Mamba (not for matplotlib): copy and paste
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
+conda install -n Senior_Design_py310_source conda-forge::mamba
+mamba install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install numpy==1.26.4
+mamba install conda-forge::p-tqdm
+mamba install conda-forge::pretty_errors
+pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
+mamba install ipykernel
+pip install "napari[all]"
+pip install imageio[ffmpeg]
+conda install conda-forge::matplotlib
+pip3 install opencv-python
+pip install imagecodecs
+
+
+FOR LINUX:
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
+conda install -n Senior_Design_py310_source conda-forge::mamba
+mamba install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install numpy==1.26.4
+mamba install conda-forge::p-tqdm
+mamba install conda-forge::pretty_errors
+## First time install =================================
+# sudo apt update
+# sudo apt install cmake build-essential python3-dev
+# conda install -c conda-forge cmake ninja
+# pip install --upgrade setuptools wheel
+## ====================================================
+pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D
+mamba install ipykernel
+pip install "napari[all]"
+pip install imageio[ffmpeg]
+conda install conda-forge::matplotlib
+pip3 install opencv-python
+pip install imagecodecs
+
+FOR LINUX Just for Training and Preprocessing (No Mamba):
+conda create -n Senior_Design_py310_source python=3.10
+conda activate Senior_Design_py310_source
+conda install pytorch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 pytorch-cuda=12.1 -c pytorch -c nvidia
+pip install numpy==1.26.4
+## First time install =================================
+# sudo apt update
+# sudo apt install cmake build-essential python3-dev
+# conda install -c conda-forge cmake ninja
+# pip install --upgrade setuptools wheel
+## ====================================================
+pip install ParticleSeg3D
+pip install git+https://github.com/MIC-DKFZ/nnUNet.git@ParticleSeg3D

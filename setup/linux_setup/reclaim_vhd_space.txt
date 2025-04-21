@@ -1,0 +1,7 @@
+1. PowerShell
+wsl --shutdown
+diskpart
+
+2. DiskPart
+select vdisk file="C:\Users\dchen\AppData\Local\wsl\{b15d7fdc-c97b-48b7-ba7d-2d58957e3471}\ext4.vhdx"
+compact vdisk
