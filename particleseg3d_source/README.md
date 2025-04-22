@@ -262,3 +262,9 @@ The directories for the database, outputs, and weights should be organized as fo
             ├── fold_4
             ├── plans.pkl
     ├── ...
+```
+# Transfer Learning Procedure
+
+> **Note**: For all steps related to transfer learning, please follow the original procedure outlined in the [ParticleSeg3D GitHub repository](https://github.com/MIC-DKFZ/ParticleSeg3D) and its corresponding [ParticleSeg3D branch within the nnU-Net repository](https://github.com/MIC-DKFZ/nnUNet/tree/ParticleSeg3D).
+
+Although this project includes revised preprocessing and training scripts (e.g., for memory handling, normalization, and compatibility), they are compatible with the original methodology. By following the procedures defined in the original repositories—especially for data structuring and training workflows—the modified scripts in this repository can be used effectively to perform transfer learning or train new models.
