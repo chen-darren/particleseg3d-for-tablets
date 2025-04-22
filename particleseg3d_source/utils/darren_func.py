@@ -128,37 +128,6 @@ def convert_zarr_to_tiff(zarr_dir, tiff_dir, image_name=None, to_binary=False):
     # p_map(lambda img: process_image(img, zarr_dir, tiff_dir), image_list, num_cpus=32)
 
     print("Conversion complete.")
-
-def setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag):
-    if dir_location.lower() == 'internal':
-        base_path = r'C:\Senior_Design'
-    elif dir_location.lower() == 'external':
-        base_path = r'D:\Senior_Design'
-    elif dir_location.lower() == 'cloud':
-        base_path = r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files'
-    elif dir_location.lower() == 'refine':
-        base_path = r'D:\Darren\Files'
-    else:
-        raise ValueError('Invalid directory location type')
-    
-    base_input_path = os.path.join(base_path, 'database')
-    base_output_path = os.path.join(base_path, 'outputs')
-    if output_to_cloud:
-        base_output_path = os.path.join(r'C:\Users\dchen\OneDrive - University of Connecticut\Courses\Year 4\Fall 2024\BME 4900 and 4910W (Kumavor)\Python\Files', 'outputs')
-    base_weights_path = os.path.join(base_path, 'weights')
-
-    output_zarr_path = os.path.join(base_output_path, 'zarr', run_tag)
-    output_tiff_path = os.path.join(base_output_path, 'tiff', run_tag)
-    
-    if is_original_data:
-        input_path = os.path.join(base_input_path, 'orignal_dataset', 'grayscale', 'dataset')
-    else:
-        input_path = os.path.join(base_input_path, 'tablet_dataset', 'grayscale', 'dataset')
-
-    weights_path = os.path.join(base_weights_path, weights_tag)
-
-    print('Paths set')
-    return input_path, output_zarr_path, output_tiff_path, weights_path
 class PathMaster:
     def __init__(self, dir_location, output_to_cloud, run_tag, is_original_data, weights_tag):
         self.dir_location = dir_location.lower()

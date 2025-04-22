@@ -1,10 +1,10 @@
 # Metrics for Quantitative Analysis
-Darren, last edit 04/21/2025.
+Darren, last edit 04/22/2025.
 
 This directory contains notebooks designed to analyze the quality of predicted segmentations. Two types of quantitative analyses are provided: Particle Size Distribution (PSD), which focuses on the size and shape of each predicted particle, and Segmentation Metrics, which assess the quality of the binary mask, distinguishing between particle and background.
 
 # Particle Size Distribution (PSD)
-Please note that this code is located in `\particleseg3d_source\metrics\particle_size_distribution.py`, but is presented here in the form of a Jupyter Notebook.
+Please note that this code is located in `/particleseg3d_source/metrics/particle_size_distribution.py`, but is presented here in the form of a Jupyter Notebook.
 
 ## Functionality
 - **Computes PSD metrics**: Calculates **volume**, **sphericity**, **surface area**, and **diameter** for each particle.
@@ -58,7 +58,7 @@ Run PSD by using `psd(input_dir, run_tag, names, save_dir, save=True)`.
 All the results are organized by the `run_tag` and the image name in the directory structure, making it easy to distinguish between different analyses and images.
 
 # Semantic Metrics
-Please note that this code is located in `\particleseg3d_source\metrics\semantic_metrics.py`, but is presented here in the form of a Jupyter Notebook.
+Please note that this code is located in `/particleseg3d_source/metrics/semantic_metrics.py`, but is presented here in the form of a Jupyter Notebook.
 
 ## Functionality
 - **Computes Semantic Metrics**: Calculates standard performance metrics for predicted segmentation results.

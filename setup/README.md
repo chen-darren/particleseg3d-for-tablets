@@ -1,5 +1,5 @@
 # Virtual Environment Setup
-Darren, last edit 04/21/2025.
+Darren, last edit 04/22/2025.
 
 This directory contains resources and instructions to help you set up the environment necessary to run **ParticleSeg3D**, which supports inference on both **Windows** and **Linux** systems. However, **all training tasks related to nnU-Net must be performed on Linux**.
 

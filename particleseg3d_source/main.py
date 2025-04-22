@@ -610,14 +610,7 @@ def run_inference(input_path, output_zarr_path, weights_path, run_tag='No Run Ta
 
     return name
 
-def main(dir_location, output_to_cloud, is_original_data, weights_tag, run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', folds=(0, 1, 2, 3, 4), to_binary=False, psd=True, metrics=True):
-    # # Using setup_paths function
-    # input_path, output_zarr_path, output_tiff_path, weights_path = func.setup_paths(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
-
-    # names = run_inference(input_path, output_zarr_path, weights_path, run_tag, metadata, name, strategy, folds=folds)
-    # func.convert_zarr_to_tiff(output_zarr_path, output_tiff_path, names, to_binary)
-    
-    # Using PathMaster class
+def main(dir_location, output_to_cloud=False, is_original_data=False, weights_tag='Task502_Manual_Split_TL_Fold0', run_tag='No Run Tag Inputted', metadata='metadata', name=None, strategy='singleGPU', folds=(0, 1, 2, 3, 4), to_binary=False, psd=True, metrics=True):
     pathmaster = func.PathMaster(dir_location, output_to_cloud, run_tag, is_original_data, weights_tag)
     names = run_inference(pathmaster.grayscale_path, pathmaster.pred_zarr_path, pathmaster.weights_path, pathmaster.run_tag, metadata, name, strategy, folds=folds)
     # names = name
@@ -634,7 +627,6 @@ if __name__ == "__main__":
     dir_location='refine'
     output_to_cloud = False
     is_original_data = False
-    # weights_tag = 'Pretrained_ParticleSeg3D'
     weights_tag = 'Task502_Manual_Split_TL_Fold0'
     metadata = 'tab40_gen35_clar35'
     names = ['2_Tablet', '4_GenericD12', '5_ClaritinD12']
