@@ -1,5 +1,7 @@
-# ParticleSeg3D for the Analysis of Pharmaceutical Tablets
-By Darren Chen for the Biomedical Engineering Senior Design Project at the University of Connecticut
+# ParticleSeg3D for the Analysis of Pharmaceutical Tablets  
+By Darren Chen — Biomedical Engineering Senior Design Project, University of Connecticut (2024–2025)
+
+This branch contains all of Darren's work throughout the 2024–2025 academic year focused on applying ParticleSeg3D to pharmaceutical tablet analysis for Senior Design.
 
 ## ParticleSeg3D Source Code Implementation
 - Use the source code implementation if a greater degree of control over ParticleSeg3D is desired
