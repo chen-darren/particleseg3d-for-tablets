@@ -1,5 +1,5 @@
 # ParticleSeg3D Source Code
-Darren, last edit 04/22/2025.
+Darren, last edit 04/24/2025.
 
 This directory includes the original ParticleSeg3D source code, along with custom additions and revisions made to improve and optimize the inference pipeline. These modifications include both standalone scripts (e.g., for quantitative analysis) and direct edits to the original source code.
 
@@ -162,6 +162,7 @@ Please note that additional revisions or optimizations may have been made to the
 ### 7. **Metrics and PSD Computation Integration**
 - Implemented semantic segmentation metrics and particle size distribution (PSD) computation.
 - Integrated both into the inference pipeline via `/particleseg3d_source/main.py`.
+    - The corresponding scripts from `/particleseg3d_source/metrics` are imported and used. These scripts retain the same functionality as their counterparts in the original `/metrics` directory. 
 
 ### 8. **Customized Weight Loading**
 - Adjusted weight loading in `/particleseg3d_source/main.py` to support transfer learning models.
